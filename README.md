@@ -15,5 +15,11 @@
 - 疎通確認
   ```
   cd nextjs-p-ground
-  yarn run dev
+  yarn dev
+  ```
+- tsconfig.json初期化
+  ```
+  # cd nextjs-p-ground
+  touch tsconfig.json
+  yarn devdd
   ```
