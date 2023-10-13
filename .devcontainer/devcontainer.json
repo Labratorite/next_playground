@@ -6,7 +6,13 @@
 	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-18-bookworm",
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"version": "latest",
+			"enableNonRootDocker": "true",
+			"moby": "true"
+		}
+	},
 
 	// コンテナ内のポートをホスト側に公開するための設定
 	"appPort": ["3000:3000"],

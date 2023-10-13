@@ -23,3 +23,23 @@
   touch tsconfig.json
   yarn devdd
   ```
+#### 2. MYSQL image 作成　with Docker in Docker (https://github.com/devcontainers/templates/blob/main/src/docker-in-docker/README.md)
+
+- Docker in DockerをDevContainerに追加 
+  ```
+  	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"version": "latest",
+			"enableNonRootDocker": "true",
+			"moby": "true"
+		}
+	},
+  ```
+  - 追加できるfeature https://containers.dev/features
+- DevContainer を再作成
+- docker-compose.yml を作成して、構築したいserviceの設定追加
+  ```
+  touch docker-compose.yml
+  # 略
+  docker-compose up 
+  ```
