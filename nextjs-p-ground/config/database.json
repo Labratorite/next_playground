@@ -1,0 +1,27 @@
+{
+  "development": {
+    "username": "docker",
+    "password": "docker",
+    "database": "nextjs_p",
+	"port": "3306",
+    "host": "localhost",
+    "dialect": "mysql",
+    "migrationStorageTableSchema": "_sequelize"	
+  },
+  "test": {
+    "username": "docker",
+    "password": "docker",
+    "database": "nextjs_p_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql",
+    "migrationStorageTableSchema": "_sequelize"	
+  },
+  "production": {
+    "username": "docker",
+    "password": "docker",
+    "database": "nextjs_p",
+    "host": "localhost",
+    "dialect": "mysql",
+    "migrationStorageTableSchema": "_sequelize"	
+  }
+}

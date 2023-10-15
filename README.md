@@ -1,6 +1,8 @@
 ### 概要
 - VSCode の DevContainer テスト
 - DevContainerでNext.js
+- Docker in DockerでDevContainerにmysql構築
+- SequelizeでDB Migration
 
 ### Setup
 #### 1. Devcontainer (https://note.com/shift_tech/n/nf9c647e5264c)
@@ -42,4 +44,40 @@
   touch docker-compose.yml
   # 略
   docker-compose up 
+  ```
+### 3. SequelizeでDB Migration
+- install (https://sequelize.org/docs/v6/getting-started/)
+  ```
+  # cd nextjs-p-ground
+  npm install sequelize  --save
+  npm install mysql2  --save
+  
+  npm install sequelize-cli --save-dev
+
+  touch .sequelizerc
+
+  npx sequelize-cli init
+  ```
+- model create(https://sequelize.org/docs/v7/cli/)
+  ```
+  # 例
+  npx sequelize-cli model:generate --name User  --underscored --attributes firstName:string,lastName:string,email:string
+  # modelがもうある
+  npx sequelize-cli migration:generate --name user
+  ```
+
+#### コマンド
+- migration
+  ```
+  npx sequelize-cli db:migrate
+  ## undo the most recent migration.
+  # npx sequelize-cli db:migrate:undo
+  ## all of migrations
+  # npx sequelize-cli db:migrate:undo:all
+  ## revert back to a specific migration by passing its name with the --to option.
+  # npx sequelize-cli db:migrate:undo:all --to XXXXXXXXXXXXXX-create-posts.js
+  ```
+- seeding
+  ```
+  npx sequelize-cli seed:generate --name demo-user
   ```
