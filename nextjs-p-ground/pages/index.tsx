@@ -1,7 +1,15 @@
+import { GetServerSideProps } from 'next'
 import Head from 'next/head';
+import { User } from '@models/index';
 import styles from '../styles/Home.module.css';
 
-export default function Home() {
+type Props = {
+  message: string;
+  users?: User[];
+}
+export default function Home(props: Props) {
+  console.log('props', props);
+  console.log('env', process.env);
   return (
     <div className={styles.container}>
       <Head>
@@ -128,4 +136,23 @@ export default function Home() {
       `}</style>
     </div>
   );
+}
+
+export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
+  const result = await fetch('http://localhost:3000/api/list');
+  const data = await result.json();
+  if (result.ok) {
+    return {
+      props: {
+        users: data.users,
+        message: data.message
+      }
+    }
+  } else {
+    return {
+      props: {
+        message: 'test' + (data.message || data.error)
+      }
+    }
+  }
 }

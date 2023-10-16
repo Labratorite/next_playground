@@ -18,11 +18,11 @@ services:
     restart: always
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
-      - nextjs-p:/var/lib/mysql
+      - dbdata:/var/lib/mysql
      #- ./docker/db/sql:/docker-entrypoint-initdb.d
     expose:
       - ${DB_PORT}
     ports:
       - ${DB_PORT}:3306
 volumes:
-  nextjs-p:
+  dbdata:

@@ -3,6 +3,8 @@
 - DevContainerでNext.js
 - Docker in DockerでDevContainerにmysql構築
 - SequelizeでDB Migration
+- Sequelizeのtypescript対応
+
 
 ### Setup
 #### 1. Devcontainer (https://note.com/shift_tech/n/nf9c647e5264c)
@@ -52,7 +54,9 @@
   npm install sequelize  --save
   npm install mysql2  --save
   
-  npm install sequelize-cli --save-dev
+  # v6.6.1 では*.tsのconfigが処理できなかった
+  #npm install sequelize-cli --save-dev
+  npm i sequelize-cli@6.3.0 --save-dev
 
   touch .sequelizerc
 
@@ -80,4 +84,20 @@
 - seeding
   ```
   npx sequelize-cli seed:generate --name demo-user
+  npx sequelize-cli db:seed:all
+  ```
+#### Sequelizeのtypescript対応
+https://sequelize.org/docs/v6/other-topics/typescript/
+```
+We're working hard on making Sequelize a breeze to use in TypeScript. Some parts are still a work in progress. We recommend using sequelize-typescript to bridge the gap until our improvements are ready to be released.
+```
+- sequelize-typescript install(https://github.com/sequelize/sequelize-typescript)
+  ```
+  npm install --save-dev @types/validator
+  npm install reflect-metadata sequelize-typescript
+  ```
+- configをts化
+  ```
+  npm i dotenv
+  git mv config/database.json config/database.ts
   ```
