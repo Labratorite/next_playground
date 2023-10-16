@@ -15,15 +15,15 @@
 　　- https://qiita.com/P-man_Brown/items/5628ef68f51d1acf38e0
 - コンテナーで再度開く
 #### 2. Next.js Install (https://nextjs.org/learn/basics/create-nextjs-app/setup)
-- `npx create-next-app@latest nextjs-p-ground --use-npm --example "https://github.com/vercel/next-learn/tree/main/basics/learn-starter"`
+- `npx create-next-app@latest nextjs --use-npm --example "https://github.com/vercel/next-learn/tree/main/basics/learn-starter"`
 - 疎通確認
   ```
-  cd nextjs-p-ground
+  cd nextjs
   yarn dev
   ```
 - tsconfig.json初期化
   ```
-  # cd nextjs-p-ground
+  # cd nextjs
   touch tsconfig.json
   yarn devdd
   ```
@@ -50,7 +50,7 @@
 ### 3. SequelizeでDB Migration
 - install (https://sequelize.org/docs/v6/getting-started/)
   ```
-  # cd nextjs-p-ground
+  # cd nextjs
   npm install sequelize  --save
   npm install mysql2  --save
   
@@ -101,3 +101,24 @@ We're working hard on making Sequelize a breeze to use in TypeScript. Some parts
   npm i dotenv
   git mv config/database.json config/database.ts
   ```
+
+### 5. Debug環境作成
+- next.jsアプリがサブフォルダで動いているので、workspaceで開く
+   ```
+   touch workspaces.code-workspace
+   // 内部に、ルートディレクトリのworkspacesと、nextjsのworkspaceを定義
+	"folders": [
+	 {
+	  "name": "root",
+	  "path": "."
+	 },
+	 {
+	  "name": "nextjs",
+	  "path": "./nextjs"
+	 }
+	],
+   ```
+　　- メニューファイル＞ファイルでワークスペースを開く＞上記code-workspaceを指定
+      - 拡張機能への影響参考：https://qiita.com/YuichiNukiyama/items/ef16a0219f46ea03a045#%E6%8B%A1%E5%BC%B5%E6%A9%9F%E8%83%BD%E3%81%B8%E3%81%AE%E5%BD%B1%E9%9F%BF
+- nextjsのworkspaceに、デバッグ構成定義
+  https://nextjs.org/docs/pages/building-your-application/configuring/debugging#debugging-with-vs-code

@@ -1,0 +1,14 @@
+{
+	"folders": [
+	 {
+	  "name": "root",
+	  "path": "."
+	 },
+	 {
+	  "name": "nextjs",
+	  "path": "./nextjs"
+	 }
+	],
+	"settings": {},
+	"extensions": {},
+}
