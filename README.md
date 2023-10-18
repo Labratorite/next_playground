@@ -6,13 +6,33 @@
 - Sequelizeのtypescript対応
 
 
-### Setup
+### Usage
+- 1. VSCodeにて拡張機能Devcontainer(ms-vscode-remote.remote-containers) をinstall
+- 2. 開発コンテナーから開く
+  - 初回にcontainerが作成される
+- 3. メニュー＞ファイル＞ファイルでワークスペースを開く＞.code-workspace を選択して開く
+  - 主にdebugerのためなので必須ではない
+- 4. /nextjs 配下でターミナルを開いてsetup
+  - `npm install`
+  - DBコンテナ作成、migration、seeding
+    - `make init` でOK
+    - 個別に実行する場合
+      ```
+      docker-compose up -d
+      npx sequelize-cli db:migrate
+      npx sequelize-cli db:seed
+      ```
+- 4. `npm run dev`
+
+
+
+### Setup Record
 #### 1. Devcontainer (https://note.com/shift_tech/n/nf9c647e5264c)
 - 開発コンテナー構成ファイルを追加
 - テンプレートからimage選択 (Node.js & Typescript)
 - devcontainer.jsonに追記
   - git の`fatal: detected dubious ownership in repository`対策
-　　- https://qiita.com/P-man_Brown/items/5628ef68f51d1acf38e0
+    - https://qiita.com/P-man_Brown/items/5628ef68f51d1acf38e0
 - コンテナーで再度開く
 #### 2. Next.js Install (https://nextjs.org/learn/basics/create-nextjs-app/setup)
 - `npx create-next-app@latest nextjs --use-npm --example "https://github.com/vercel/next-learn/tree/main/basics/learn-starter"`
@@ -27,7 +47,7 @@
   touch tsconfig.json
   yarn devdd
   ```
-#### 2. MYSQL image 作成　with Docker in Docker (https://github.com/devcontainers/templates/blob/main/src/docker-in-docker/README.md)
+#### 2. MYSQL image 作成　with [Docker in Docker](https://github.com/devcontainers/templates/blob/main/src/docker-in-docker/README.md)
 
 - Docker in DockerをDevContainerに追加 
   ```
@@ -118,7 +138,18 @@ We're working hard on making Sequelize a breeze to use in TypeScript. Some parts
 	 }
 	],
    ```
-　　- メニューファイル＞ファイルでワークスペースを開く＞上記code-workspaceを指定
-      - 拡張機能への影響参考：https://qiita.com/YuichiNukiyama/items/ef16a0219f46ea03a045#%E6%8B%A1%E5%BC%B5%E6%A9%9F%E8%83%BD%E3%81%B8%E3%81%AE%E5%BD%B1%E9%9F%BF
+  - メニューファイル＞ファイルでワークスペースを開く＞上記code-workspaceを指定
+    - 拡張機能への影響参考：https://qiita.com/YuichiNukiyama/items/ef16a0219f46ea03a045#%E6%8B%A1%E5%BC%B5%E6%A9%9F%E8%83%BD%E3%81%B8%E3%81%AE%E5%BD%B1%E9%9F%BF
 - nextjsのworkspaceに、デバッグ構成定義
   https://nextjs.org/docs/pages/building-your-application/configuring/debugging#debugging-with-vs-code
+
+### その他
+- `npm i swr`
+- `npm i date-fns`
+- `npm i -D sass`
+- `npm i clsx`
+- `// npm install -D tailwindcss autoprefixer postcss`
+- `npm i gray-matter`
+  - https://nextjs.org/learn/basics/data-fetching/blog-data
+- `npm install remark remark-html`
+  - https://nextjs.org/learn/basics/dynamic-routes/render-markdown

@@ -7,8 +7,15 @@ export type ResponseData = {
   error?: string;
 }
 
+interface ApiRequest extends NextApiRequest{
+  body:{
+      email:string
+  }
+}
+
+// const handler: NextApiHandler<ResponseData> = async (req, res) => {
 export default async function handler(
-  req: NextApiRequest,
+  req: ApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
   try {
