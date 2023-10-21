@@ -26,7 +26,17 @@
 
 	// Configure tool-specific properties.
 	"customizations": {
-		"vscode": { "extensions": ["esbenp.prettier-vscode", "EditorConfig.EditorConfig", "ms-vscode.makefile-tools"] }
+		"vscode": {
+			"extensions": [
+				"esbenp.prettier-vscode",
+				"EditorConfig.EditorConfig"
+			],
+			"settings": {
+                "eslint.nodePath": "./nextjs/node_modules",
+                "eslint.workingDirectories": ["./nextjs"],
+                "editor.defaultFormatter": "esbenp.prettier-vscode"
+			}
+		}
 	}
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.

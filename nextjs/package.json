@@ -5,7 +5,8 @@
     "dev": "next dev",
     "start": "next start",
     "migrate:up": "npx sequelize-cli db:migrate",
-    "migrate:undo": "npx sequelize-cli db:migrate:undo"
+    "migrate:undo": "npx sequelize-cli db:migrate:undo",
+    "lint": "next lint"
   },
   "dependencies": {
     "clsx": "^2.0.0",
@@ -30,6 +31,13 @@
     "@types/node": "20.8.4",
     "@types/react": "18.2.28",
     "@types/validator": "^13.11.3",
+    "@typescript-eslint/eslint-plugin": "^6.8.0",
+    "@typescript-eslint/parser": "^6.8.0",
+    "eslint": "^8.51.0",
+    "eslint-config-next": "^13.5.6",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-react": "^7.33.2",
+    "prettier": "^3.0.3",
     "sass": "^1.69.3",
     "sequelize-cli": "^6.3.0",
     "typescript": "5.2.2"

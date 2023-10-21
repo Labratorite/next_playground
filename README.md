@@ -143,6 +143,21 @@ We're working hard on making Sequelize a breeze to use in TypeScript. Some parts
 - nextjsのworkspaceに、デバッグ構成定義
   https://nextjs.org/docs/pages/building-your-application/configuring/debugging#debugging-with-vs-code
 
+### 6. ESLint config
+- https://nextjs.org/docs/pages/building-your-application/configuring/eslint
+- package.json にscript追加
+  - `"lint": "next lint"`
+- `yarn lint`
+  - .eslintrc.jsonが作成され、`eslint-config-next`がinstallされる
+- Prettierとの連携(https://nextjs.org/docs/pages/building-your-application/configuring/eslint#usage-with-other-tools)
+  - install
+    ```
+    npm i  -D prettier
+    touch .prettierrc.json
+    ```
+  - `npm install --save-dev eslint-config-prettier`
+  - .eslintrc.jsonに追記
+
 ### その他
 - `npm i swr`
 - `npm i date-fns`
