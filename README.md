@@ -4,6 +4,9 @@
 - Docker in DockerでDevContainerにmysql構築
 - SequelizeでDB Migration
 - Sequelizeのtypescript対応
+#### nextjs
+- [Pages Router](https://nextjs.org/docs/pages)でbasic チュートリアル
+- Pages Router から App Router にmigrate
 
 
 ### Usage
@@ -119,7 +122,7 @@ We're working hard on making Sequelize a breeze to use in TypeScript. Some parts
 - configをts化
   ```
   npm i dotenv
-  git mv config/database.json config/database.ts
+  git mv config/database.json config/database.js
   ```
 
 ### 5. Debug環境作成
@@ -158,6 +161,10 @@ We're working hard on making Sequelize a breeze to use in TypeScript. Some parts
   - `npm install --save-dev eslint-config-prettier`
   - .eslintrc.jsonに追記
 
+### 7. pages から appに migrate
+- https://nextjs.org/docs/pages/building-your-application/upgrading/app-router-migration#migrating-from-pages-to-app
+- app routings時、Static レンダリングのためにはネイティブの`fetch`で`{ cache: 'no-store' }`を指定して実行する必要があるが、ネイティブの`fetch`は相対urlを許容していない
+
 ### その他
 - `npm i swr`
 - `npm i date-fns`
@@ -168,3 +175,4 @@ We're working hard on making Sequelize a breeze to use in TypeScript. Some parts
   - https://nextjs.org/learn/basics/data-fetching/blog-data
 - `npm install remark remark-html`
   - https://nextjs.org/learn/basics/dynamic-routes/render-markdown
+- `npm install @faker-js/faker --save-dev`

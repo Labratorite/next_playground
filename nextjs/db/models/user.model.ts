@@ -33,28 +33,26 @@ import {Model, Column, Table, BelongsToMany, CreatedAt, UpdatedAt} from "sequeli
   tableName: "Users",
 })
 export class User extends Model<User> {
-  /*
   @Column
-  first_name!: string;
+  firstName!: string;
 
   @Column
-  last_name!: string;
+  lastName!: string;
 
   @Column
   email!: string;
-
+  /*
   @Column
   birthday?: Date;
 
   @BelongsToMany(() => Movie, () => MovieActor)
   movies?: Movie[];
-
+  */
   @CreatedAt
   @Column
-  created_at!: Date;
+  createdAt!: Date;
 
   @UpdatedAt
   @Column
-  updated_at!: Date;
-*/
+  updatedAt!: Date;
 }
