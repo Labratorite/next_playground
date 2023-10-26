@@ -2,7 +2,6 @@
 
 import Error from 'next/error'
 import React from 'react';
-import Head from 'next/head';
 import Link from 'next/link';
 import Script from 'next/script';
 import useSWR from 'swr';
@@ -34,9 +33,6 @@ const FirstPost: React.FC<Props> = (props) => {
 
   return (
     <>
-      <Head>
-        <title>First Post</title>
-      </Head>
       <Script
         src="https://connect.facebook.net/en_US/sdk.js"
         strategy="lazyOnload"

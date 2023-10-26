@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
   return User;
 };
 */
-import {Model, Column, Table, BelongsToMany, CreatedAt, UpdatedAt} from "sequelize-typescript";
+import {Model, Column, Table, DeletedAt, CreatedAt, UpdatedAt} from "sequelize-typescript";
 
 @Table({
   timestamps: true,
@@ -55,4 +55,8 @@ export class User extends Model<User> {
   @UpdatedAt
   @Column
   updatedAt!: Date;
+
+  @DeletedAt
+  @Column
+  deletedAt: Date;
 }

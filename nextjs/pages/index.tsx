@@ -19,9 +19,10 @@ export default function Home(props: Props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <section className={utilStyles.headingMd}>
+      <article className={utilStyles.headingMd}>
         <p>
-          Hi, this is KK, I'm a software enginer. I'm working on tutorial of Next.js.
+          Hi, this is KK, I'm a software enginer. I'm working on tutorial of Next.js based on Page Router.
+          after then, I do some private study with App Router.
         </p>
         <ul>
           <li><Link href="https://github.com/Labratorite">Github</Link></li>
@@ -30,10 +31,14 @@ export default function Home(props: Props) {
           (This is a sample website - you’ll be building a site like this on{" "}
           <a href="https://nextjs.org/learn">our Next.js tutorial</a>.)
         </p>
+        <p>Private Study with App Routing below.</p>
         <p>
-          <Link href="/posts/first-post">Here</Link> is changing route
+          <Link href="/workflows">Here</Link> is changing route
         </p>
-      </section>
+        <p>
+          <Link href="/posts">Here</Link> is changing route2
+        </p>
+      </article>
 
       {/* Add this <section> tag below the existing <section> tag */}
       <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>

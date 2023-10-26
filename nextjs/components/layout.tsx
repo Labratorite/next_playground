@@ -7,6 +7,7 @@ import utilStyles from '../styles/utils.module.scss';
 import Link from 'next/link';
 
 import { usePathname } from 'next/navigation';
+import { Stack } from '@mui/material';
 
 const name = 'Your Name';
 export const siteTitle = 'Next.js Sample Website';
@@ -49,14 +50,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <h1 className={utilStyles.heading2Xl}>{name}</h1>
           </>
         ) : (
-          <>
+          <Stack direction="row" alignItems="flex-end" spacing={1}>
             <Link href='/'>
               <Image
                 priority
                 src='/images/profile.jpg'
                 className={utilStyles.borderCircle}
-                height={108}
-                width={108}
+                height={50}
+                width={50}
                 alt=''
               />
             </Link>
@@ -65,7 +66,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 {name}
               </Link>
             </h2>
-          </>
+          </Stack>
         )}
       </header>
       <main>{children}</main>

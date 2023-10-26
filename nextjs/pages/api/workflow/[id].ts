@@ -1,0 +1,75 @@
+import type { NextApiRequest, NextApiResponse } from 'next'
+import { Workflow } from '@models';
+
+export type ResponseData = {
+  workflow: Workflow | null;
+} | Error
+
+export type PostRequestBody = {
+  workflow: Workflow;
+};
+
+interface PostApiRequest extends NextApiRequest{
+  body: PostRequestBody
+}
+
+function isPostApiRequest(arg: NextApiRequest | PostApiRequest): arg is PostApiRequest {
+  return arg.body.workflow !== undefined;
+}
+
+// const handler: NextApiHandler<ResponseData> = async (req, res) => {
+export default async function handler(
+  req: NextApiRequest | PostApiRequest,
+  res: NextApiResponse<ResponseData>
+) {
+  try {
+    const id = req.query.id as string;
+
+    if (req.method === 'GET') {
+      const workflow = await show(id);
+      res.status(200).json({ workflow });
+    } else if (req.method === 'DELETE') {
+      const workflow = await destroy(id);
+      res.status(200).json({ workflow });
+    } else if (req.method === 'PATCH') {
+      if (!isPostApiRequest(req)) {
+        res.status(500);
+        return;
+      }
+      const workflow = await update(id, req.body.workflow);
+      res.status(200).json({ workflow });
+    } else {
+      res.status(501);
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+}
+
+const show = async (id: string) => {
+  const model = await Workflow.findByPk(id)
+  return model;
+}
+
+const destroy = async (id: string) => {
+  const model = await Workflow.findByPk(id)
+  if (model) {
+    await Workflow.destroy({
+      where: { id }
+    });
+  }
+  return model;
+}
+const update = async (
+  id: string,
+  workflow: Workflow
+) => {
+  const [ affectedCount ] = await Workflow.update(workflow, {
+    where: { id },
+  })
+  if (affectedCount) {
+    const model = await Workflow.findByPk(id);
+    return model;
+  }
+  return null;
+}

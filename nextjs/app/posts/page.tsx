@@ -1,8 +1,13 @@
+import { Metadata } from 'next';
 import FirstPost, { Props } from './first-post'
 import { User } from 'db/models';
 //import { UserRepository } from 'db/repositories/UserRepository';
 //import { localServerFetch } from '@api/index';
 //import { ResponseData } from '@api/list';
+
+export const metadata: Metadata = {
+  title: 'First Post',
+};
 
 export default async function Page() {
   const props = await getPosts()

@@ -1,19 +1,27 @@
 'use strict';
 
 /** @type {import('sequelize-cli').Migration} */
+const { fakerJA: faker } = require('@faker-js/faker');
+
 module.exports = {
-  async up (queryInterface, Sequelize) {
-    return queryInterface.bulkInsert('Users', [{
-		firstName: 'Ka',
-		lastName: 'Ko',
-        nickname: 'KK',
-		email: 'example@example.com',
-		createdAt: new Date(),
-		updatedAt: new Date()
-	  }]);
+  async up (queryInterface) {
+    const users = [...Array(20)].map(() => (
+      {
+        firstName: faker.person.firstName(),
+        lastName: faker.person.lastName(),
+        nickname: faker.internet.userName(),
+        email: faker.internet.email(),
+        //userName: faker.internet.userName(),
+        //password: faker.internet.password(8),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ));
+
+    return queryInterface.bulkInsert('Users', users, {});
   },
 
-  async down (queryInterface, Sequelize) {
+  async down (queryInterface) {
     /**
      * Add commands to revert seed here.
      *

@@ -4,6 +4,7 @@
 - Docker in DockerでDevContainerにmysql構築
 - SequelizeでDB Migration
 - Sequelizeのtypescript対応
+
 #### nextjs
 - [Pages Router](https://nextjs.org/docs/pages)でbasic チュートリアル
 - Pages Router から App Router にmigrate
@@ -176,3 +177,6 @@ We're working hard on making Sequelize a breeze to use in TypeScript. Some parts
 - `npm install remark remark-html`
   - https://nextjs.org/learn/basics/dynamic-routes/render-markdown
 - `npm install @faker-js/faker --save-dev`
+
+- `npm install @mui/material @emotion/react @emotion/styled`
+- `npm install @mui/icons-material @mui/x-data-grid`

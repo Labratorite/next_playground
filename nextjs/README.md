@@ -17,3 +17,7 @@ This is a starter template for [Learn Next.js](https://nextjs.org/learn).
       npx sequelize-cli db:seed
       ```
 - 4. `npm run dev`
+
+### NOTE
+- page router と app routerを共存させています
+- [Page Rourter](https://nextjs.org/docs/app/api-reference/file-conventions)

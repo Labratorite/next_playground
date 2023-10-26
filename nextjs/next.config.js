@@ -3,7 +3,7 @@ const nextConfig = {
 /* config options here */
   // https://github.com/sequelize/sequelize/issues/7509
   output: 'standalone',
-  experimental: { appDir: true, serverComponentsExternalPackages: ['sequelize'] }
+  experimental: { serverComponentsExternalPackages: ['sequelize'] }
 }
 
 module.exports = nextConfig;
