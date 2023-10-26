@@ -1,7 +1,6 @@
 'use strict';
 
 import {Model, Column, Table, HasMany, DeletedAt, CreatedAt, UpdatedAt} from "sequelize-typescript";
-import { WorkflowNode } from "./WorkflowNode.model";
 
 @Table({
   timestamps: true,
@@ -16,9 +15,6 @@ export class Workflow extends Model<Workflow> {
 
   @Column
   publish!: boolean;
-
-  @HasMany(() => WorkflowNode)
-  nodes?: WorkflowNode[];
 
   @CreatedAt
   @Column
