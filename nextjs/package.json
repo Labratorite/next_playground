@@ -28,6 +28,7 @@
     "remark-html": "^16.0.1",
     "sequelize": "^6.33.0",
     "sequelize-typescript": "^2.1.5",
+    "sqlite3": "^5.1.6",
     "swr": "^2.2.4"
   },
   "engines": {

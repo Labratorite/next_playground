@@ -1,30 +1,29 @@
 require('dotenv').config();
 
+const mysql = {
+  "username": process.env.DB_USERNAME,
+  "password": process.env.DB_PASSWORD,
+  "database": process.env.DB_DATABASE,
+  "port": process.env.DB_PORT,
+  "host": "localhost",
+  "dialect": "mysql",
+  "migrationStorageTableSchema": "_sequelize"
+};
+
+const sqlite = {
+  "dialect": "sqlite",
+  "storage": ":memory:",
+};
+
 const configs = {
   "development": {
-    "username": process.env.DB_USERNAME,
-    "password": process.env.DB_PASSWORD,
-    "database": process.env.DB_DATABASE,
-	  "port": process.env.DB_PORT,
-    "host": "localhost",
-    "dialect": "mysql",
-    "migrationStorageTableSchema": "_sequelize"
+    ...mysql,
   },
   "test": {
-    "username": "docker",
-    "password": "docker",
-    "database": "nextjs_p_test",
-    "host": "127.0.0.1",
-    "dialect": "mysql",
-    "migrationStorageTableSchema": "_sequelize"
+    ...sqlite,
   },
   "production": {
-    "username": "docker",
-    "password": "docker",
-    "database": "nextjs_p",
-    "host": "localhost",
-    "dialect": "mysql",
-    "migrationStorageTableSchema": "_sequelize"
+    ...sqlite,
   }
 };
 

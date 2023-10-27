@@ -77,6 +77,7 @@
   # cd nextjs
   npm install sequelize  --save
   npm install mysql2  --save
+  npm install sqlite3
   
   # v6.6.1 では*.tsのconfigが処理できなかった
   #npm install sequelize-cli --save-dev

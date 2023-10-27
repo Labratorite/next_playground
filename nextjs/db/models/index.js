@@ -7,6 +7,17 @@ export { User } from './user.model';
 export { Workflow } from './workflow.model';
 
 import config from 'config/database';
+import Seeders from '../seeders';
+
+/*
+const models = {
+  'User': User,
+  'Workflow': Workflow,
+  'WorkflowNode': WorkflowNode,
+  'WorkflowApprover': WorkflowApprover,
+  'WorkflowNodeRelation': WorkflowNodeRelation
+}
+*/
 
 const modelMatch = (filename, member) => {
   return (
@@ -54,6 +65,13 @@ fs.readdirSync(cmd)
   });
 
 sequelize.addModels(Object.values(models));
+
+// this is private study project. basicly running on sqlite.
+// it can remigration every time.
+//https://sequelize.org/docs/v6/core-concepts/model-basics/
+sequelize.sync().then(() => {
+  Seeders(sequelize.getQueryInterface());
+});
 
 models.sequelize = sequelize;
 module.exports = models; // export するinstanseとaddModelsしたinstanceが同じである必要がある

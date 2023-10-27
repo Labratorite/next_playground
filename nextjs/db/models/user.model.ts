@@ -41,6 +41,9 @@ export class User extends Model<User> {
 
   @Column
   email!: string;
+
+  @Column
+  nickname!: string;
   /*
   @Column
   birthday?: Date;
