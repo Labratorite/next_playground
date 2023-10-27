@@ -1,6 +1,7 @@
 import { GetStaticProps } from "next";
 import Link from "next/link";
 import Head from "next/head";
+import Image from 'next/image';
 import { getSortedArticlesData, ArticleData } from 'lib/articles';
 import Date from 'components/date';
 import styles from "styles/Home.module.css";
@@ -21,8 +22,8 @@ export default function Home(props: Props) {
 
       <article className={utilStyles.headingMd}>
         <p>
-          Hi, this is KK, I'm a software enginer. I'm working on tutorial of Next.js based on Page Router.
-          after then, I do some private study with App Router.
+          {"Hi, this is KK, I'm a software enginer. I'm working on tutorial of Next.js based on Page Router."}
+          {"After then, I do some private study with App Router."}
         </p>
         <ul>
           <li><Link href="https://github.com/Labratorite">Github</Link></li>
@@ -63,7 +64,7 @@ export default function Home(props: Props) {
           rel="noopener noreferrer"
         >
           Powered by{" "}
-          <img src="/vercel.svg" alt="Vercel" className={styles.logo} />
+          <Image src="/vercel.svg" alt="Vercel" className={styles.logo} />
         </a>
       </footer>
     </>

@@ -12,7 +12,7 @@ export default function Article(props: PageProps) {
   const { article } = props;
   const { isFallback } = useRouter();
 
-  if (isFallback) {
+  if (isFallback || !article) {
     return <div>Loading...</div>
   }
 
@@ -26,7 +26,7 @@ export default function Article(props: PageProps) {
         <div className={utilStyles.lightText}>
           <Date dateString={article.date} />
         </div>
-        <div dangerouslySetInnerHTML={{ __html: article.contentHtml }} />
+        <div dangerouslySetInnerHTML={{ __html: article.contentHtml || '' }} />
       </article>
     </>
   );
@@ -41,9 +41,11 @@ export const getStaticPaths: GetStaticPaths<PageParams> = async () => {
 }
 
 export const getStaticProps: GetStaticProps<PageProps, PageParams> = async ({params}) => {
-  const { id } = params;
 
   try {
+    if (!params?.id) throw new Error('page param not found');
+
+    const { id } = params;
     const article = await getArticleData(id);
     return { props: { article }, revalidate: 1,};
   } catch (error) {
