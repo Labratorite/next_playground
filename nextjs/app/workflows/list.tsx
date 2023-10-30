@@ -14,6 +14,7 @@ import {
   GridToolbarContainer,
   GridRowEditStopReasons,
   GridEventListener,
+  useGridApiRef,
 } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -120,7 +121,7 @@ type Props = {
   workflows: WorkflowRow[];
   removeRow: (rowId: string | number, editCanceled: boolean) => Promise<void>;
   addRow: (rowId: string | number) => void;
-  updateRow: (
+  saveRow: (
     newRow: WorkflowRow,
     oldRow: WorkflowRow
   ) => Promise<WorkflowRow> | WorkflowRow;
@@ -129,16 +130,10 @@ const WorkflowTable: React.FC<Props> = ({
   workflows,
   removeRow,
   addRow,
-  updateRow,
+  saveRow,
 }) => {
-  //const { setValue, watch } = useFormContext<HookForm>();
 
-  /*
-  const [rows, setRows] = React.useState<WorkflowRow[]>(workflows);
-  React.useEffect(() => {
-    setRows(workflows)
-  }, [workflows])
-  */
+  const apiRef = useGridApiRef();
 
   //const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
   const [rowModesModel, dispatchRowModesModel] = React.useReducer<
@@ -215,6 +210,8 @@ const WorkflowTable: React.FC<Props> = ({
 
     addRow(rowId);
     dispatchRowModesModel({ actionParams: { rowId, actionType: Actions.Add } });
+
+    //apiRef.current.setPage(Math.floor(workflows.length / 5));
   };
 
   /**
@@ -229,9 +226,9 @@ const WorkflowTable: React.FC<Props> = ({
       //setRows((rows) => rows.map((row) => (row.rowId === newRow.rowId ? baseModel : row)));
       //return baseModel;
       if (!newRow.name) return oldRow;
-      return await updateRow(newRow, oldRow);
+      return await saveRow(newRow, oldRow);
     },
-    []
+    [saveRow]
   );
 
   const handleProcessRowUpdateError = React.useCallback((error: Error) => {
@@ -251,17 +248,21 @@ const WorkflowTable: React.FC<Props> = ({
     }
   };
 
+  const [paginationModel, setPaginationModel] = React.useState({
+    pageSize: 5,
+    page: 0,
+  });
+
   return (
     <>
       <div style={{ height: 277, width: '100%' }}>
         <DataGrid
+          apiRef={apiRef}
           rows={workflows}
           columns={columnDef}
           density='compact'
-          autoPageSize
-          initialState={{
-            pagination: { paginationModel: { pageSize: 5 } },
-          }}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
           editMode='row'
           rowModesModel={rowModesModel}
           onRowModesModelChange={handleRowModesModelChange}

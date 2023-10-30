@@ -81,6 +81,7 @@
 }
 
 .logo {
+  position: relative;
   height: 1em;
 }
 

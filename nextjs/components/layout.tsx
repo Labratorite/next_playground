@@ -15,10 +15,6 @@ export const siteTitle = 'Next.js Sample Website';
 export default function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const home = pathname === '/';
-  /*
-  const router = useRouter();
-  const homePage = router.pathname === '/'
-  */
   return (
     <div className={styles.container}>
       <Head>

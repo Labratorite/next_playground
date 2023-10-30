@@ -15,19 +15,21 @@ const sqlite = {
   "storage": ":memory:",
 };
 
+const isInMemory = process.env.USE_IN_MEMORY_STORAGE === "true";
+const devStorage = (isInMemory)? sqlite: mysql;
+
 const configs = {
   "development": {
-    ...mysql,
+    ...devStorage,
   },
   "test": {
     ...sqlite,
   },
   "production": {
-    ...sqlite,
+    ...devStorage,
   }
 };
 
 const env = process.env.NODE_ENV || 'development';
 
 module.exports = configs[env] || configs.development;
-

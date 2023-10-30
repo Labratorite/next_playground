@@ -1,18 +1,13 @@
-import { GetStaticProps } from "next";
 import Link from "next/link";
 import Head from "next/head";
-import Image from 'next/image';
-import { getSortedArticlesData, ArticleData } from 'lib/articles';
+import { getSortedArticlesData } from 'lib/articles';
 import Date from 'components/date';
 import styles from "styles/Home.module.css";
 import utilStyles from "styles/utils.module.scss";
+import Image from "next/image";
 
-type Props = {
-  allPostsData: ArticleData[];
-};
-
-export default function Home(props: Props) {
-  const { allPostsData } = props;
+export default function Home() {
+  const allPostsData = getSortedArticlesData();
   return (
     <>
       <Head>
@@ -47,7 +42,7 @@ export default function Home(props: Props) {
         <ul className={utilStyles.list}>
           {allPostsData.map(({ id, date, title }) => (
             <li className={utilStyles.listItem} key={id}>
-              <Link href={`/articles/${id}`}>{title}</Link>
+              <Link href={`/posts/${id}`}>{title}</Link>
               <br />
               <small className={utilStyles.lightText}>
                 <Date dateString={date} />
@@ -63,19 +58,12 @@ export default function Home(props: Props) {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{" "}
-          <Image src="/vercel.svg" alt="Vercel" className={styles.logo} />
+          <div className={styles.logo}>
+            Powered by{" "}
+            <Image src="/vercel.svg" alt="Vercel" fill />
+          </div>
         </a>
       </footer>
     </>
   );
-}
-
-export const getStaticProps: GetStaticProps<Props> = async () => {
-  const allPostsData = getSortedArticlesData();
-  return {
-    props: {
-      allPostsData,
-    },
-  };
 }

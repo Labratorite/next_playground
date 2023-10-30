@@ -1,20 +1,13 @@
-import { GetStaticPaths, GetStaticProps } from "next";
 import Head from 'next/head';
-import { useRouter } from 'next/router'
 import { getSortedArticlesData, getArticleData, ArticleData } from 'lib/articles';
 import Date from 'components/date';
 import utilStyles from 'styles/utils.module.scss';
 
-type PageProps = { article?: ArticleData };
 type PageParams = Pick<ArticleData, 'id'>;
 
-export default function Article(props: PageProps) {
-  const { article } = props;
-  const { isFallback } = useRouter();
-
-  if (isFallback || !article) {
-    return <div>Loading...</div>
-  }
+export default async function Article({ params }: { params: PageParams }) {
+  const { id } = params;
+  const article = await getArticleData(id);
 
   return (
     <>
@@ -32,6 +25,12 @@ export default function Article(props: PageProps) {
   );
 }
 
+export const dynamicParams = true;
+export const generateStaticParams = async () => {
+  const articles = getSortedArticlesData();
+  return articles.map(({ id }) => ({ id }));
+}
+/*
 export const getStaticPaths: GetStaticPaths<PageParams> = async () => {
   const articles = getSortedArticlesData();
   return {
@@ -52,3 +51,4 @@ export const getStaticProps: GetStaticProps<PageProps, PageParams> = async ({par
     return { notFound: true };
   }
 }
+*/

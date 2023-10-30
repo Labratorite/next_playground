@@ -1,21 +1,55 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
+//import type { NextApiRequest, NextApiResponse } from 'next'
 import { Workflow } from '@models';
+
+type Params = { params: { id: string } };
+
+export async function GET(req: Request, { params }: Params) {
+  const { id } = params;
+  if (!id) return new Response('param key is not found', { status: 500 });
+
+  const workflow = (await show(id))?.toJSON();
+
+  return Response.json({ workflow })
+}
+
+export async function PATCH(request: Request, { params }: Params) {
+  const { id } = params;
+  const req = await request.json();
+
+  if (!isPostRequestBody(req)) {
+    return new Response('invalid body', { status: 500 });
+  }
+  const workflow = (await update(id, req.workflow))?.toJSON();
+  return Response.json({ workflow })
+}
+
+export async function DELETE(req: Request, { params }: Params) {
+  const { id } = params;
+
+  const workflow = (await destroy(id))?.toJSON();
+  return Response.json({ workflow })
+}
 
 export type ResponseData = {
   workflow: Workflow | null;
-} | Error
+};
 
-export type PostRequestBody = {
+export type PatchRequestBody = {
   workflow: Workflow;
 };
 
+function isPostRequestBody(arg: Record<string, unknown>): arg is PatchRequestBody {
+  return arg.workflow !== undefined;
+}
+/*
 interface PostApiRequest extends NextApiRequest{
   body: PostRequestBody
 }
 
-function isPostApiRequest(arg: NextApiRequest | PostApiRequest): arg is PostApiRequest {
+function isPostApiRequest(arg: Request | NextApiRequest | PostApiRequest): arg is PostApiRequest {
   return arg.body.workflow !== undefined;
 }
+
 
 // const handler: NextApiHandler<ResponseData> = async (req, res) => {
 export default async function handler(
@@ -45,7 +79,7 @@ export default async function handler(
     res.status(500).json(error);
   }
 }
-
+*/
 const show = async (id: string) => {
   const model = await Workflow.findByPk(id)
   return model;

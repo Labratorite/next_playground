@@ -1,6 +1,5 @@
 //import axios, { HttpStatusCode } from 'axios';
 import { headers } from 'next/headers';
-import {  } from '@api/list';
 
 /**
  * local url base 生成

@@ -14,7 +14,7 @@ export default async function Page() {
   return <FirstPost {...props} />
 }
 
-export const getPosts = async (): Promise<Props> => {
+const getPosts = async (): Promise<Props> => {
   try {
     const users = (await User.findAll()).map((model) => model.toJSON());
     return { users };

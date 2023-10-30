@@ -1,30 +1,27 @@
 'use strict';
 
-import fs from 'fs';
+//import fs from 'fs';
 import { Sequelize } from 'sequelize-typescript';
 
-export { User } from './user.model';
-export { Workflow } from './workflow.model';
+import { User } from './user.model';
+import { Workflow } from './workflow.model';
 
 import config from 'config/database';
 import Seeders from '../seeders';
 
-/*
 const models = {
-  'User': User,
-  'Workflow': Workflow,
-  'WorkflowNode': WorkflowNode,
-  'WorkflowApprover': WorkflowApprover,
-  'WorkflowNodeRelation': WorkflowNodeRelation
+  User,
+  Workflow,
 }
-*/
 
+/*
 const modelMatch = (filename, member) => {
   return (
     filename.substring(0, filename.indexOf('.model')).toLowerCase() ===
     member.toLowerCase()
   );
 };
+*/
 
 const sequelize = new Sequelize(
   config.database,
@@ -32,6 +29,7 @@ const sequelize = new Sequelize(
   config.password,
   {
     ...config,
+    models: Object.values(models),
     /* pathを利用してのloadが使えない
     models: [process.cwd() + '/db/models/*.model.ts'],
     modelMatch,
@@ -39,13 +37,49 @@ const sequelize = new Sequelize(
     /* 個別に書けば行けるが動的ロードを試す。
     models: [User,  Workflow]
     */
-  }
+   /*
+   hooks: {
+    afterDefine: (model) => {
+      console.log('afterDefine', model);
+      model.sync();
+    },
+   }
+   */
+   logging: true,
+  },
 );
+
+// A hook that is run after Sequelize() call
+/*
+sequelize.afterInit((seq) => {
+  console.log('afterInit');
+  console.log('afterInit: ', seq);
+
+})
+*/
+/*
+sequelize.addHook('afterInit', (seq) => {
+  // Do stuff
+  console.log('afterInit');
+  console.log('afterInit: ', seq);
+});
+*/
+/**
+ * A hook that is run after a connection is established
+ * https://sequelize.org/docs/v6/other-topics/hooks/#connection-hooks
+
+sequelize.beforeConnect((connection, options) => {
+  console.log('afterConnect');
+  console.log('afterConnect: ', connection);
+  console.log('afterConnect:options', options);
+});
+ */
 
 /**
  * 動的load
  * exportも動的にすることが可能だが、type保管が使えないのでexportは手動にする
  */
+/*
 const models = {};
 const cmd = process.cwd() + '/db/models';
 
@@ -65,15 +99,36 @@ fs.readdirSync(cmd)
   });
 
 sequelize.addModels(Object.values(models));
+*/
 
 // this is private study project. basicly running on sqlite.
 // it can remigration every time.
 //https://sequelize.org/docs/v6/core-concepts/model-basics/
-sequelize.sync().then(() => {
-  Seeders(sequelize.getQueryInterface());
-});
+const initSchema = () => {
+  return sequelize.sync().then((_this) => {
+    Seeders(_this.getQueryInterface());
+  });
+};
 
-models.sequelize = sequelize;
-module.exports = models; // export するinstanseとaddModelsしたinstanceが同じである必要がある
+if (process.env.USE_IN_MEMORY_STORAGE === "true") {
+  console.warn('init schema');
+  initSchema();
+}
 
-//export { sequelize };
+/*
+module.exports = {
+  sequelize,
+  initSchema,
+  ...models, // export するinstanseとaddModelsしたinstanceが同じである必要がある
+};
+*/
+
+//models.sequelize = sequelize;
+//models.initSchema = initSchema;
+//module.exports = models; // export するinstanseとaddModelsしたinstanceが同じである必要がある
+export {
+  sequelize,
+  initSchema,
+  User,
+  Workflow,
+};
