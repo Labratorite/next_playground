@@ -33,7 +33,7 @@ const columns: GridColDef[] = [
     width: 130,
     editable: true,
     renderCell: (params) => (
-      <Link href={`/workflow/${params.id}`}>{params.value}</Link>
+      <Link href={`/workflows/${params.id}`}>{params.value}</Link>
     ),
   },
   {

@@ -17,7 +17,6 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body>
-        <span>App Router</span>
         <Layout>{children}</Layout>
       </body>
     </html>

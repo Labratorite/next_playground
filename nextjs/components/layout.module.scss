@@ -2,7 +2,14 @@
   max-width: 80vw;
   padding: 0 1rem;
   margin: 3rem auto 6rem;
-  height: 99vh;
+  min-height: calc(99dvh - 9rem);
+
+  display: flex;
+  flex-direction: column;
+  //min-height: 100dvh;
+  main {
+    flex: 1;
+  }
 }
 
 .header {

@@ -1,11 +1,27 @@
 import { PageNotFoundError } from 'next/dist/shared/lib/utils';
-import ClientPage, { Props } from './client'
+import Client, { Props } from './client';
 import { Workflow } from '@models';
+import { Card, CardContent, CardHeader, Container, Stack } from '@mui/material';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 
 export default async function Page({ params }: { params: { id: string } }) {
-  const props = await getWorkflows(params.id)
+  const props = await getWorkflows(params.id);
 
-  return <ClientPage {...props} />
+  return (
+    <>
+      <Container component={Card} maxWidth='lg' sx={{ minHeight: '50vh', mt: '0.8rem' }} elevation={2}>
+        <CardHeader
+          avatar={<AccountTreeIcon fontSize='large' color='action' />}
+          title={props.workflow.name}
+          titleTypographyProps={{ variant: "h4" }}
+          subheader={props.workflow.name}
+        />
+        <CardContent component={Stack} direction="row" sx={{ overflowX: 'auto' }}>
+          <Client {...props} />
+        </CardContent>
+      </Container>
+    </>
+  );
 }
 /*
 export async function generateStaticParams() {
