@@ -26,7 +26,7 @@ const configs = {
     ...sqlite,
   },
   "production": {
-    ...devStorage,
+    ...sqlite,
   }
 };
 
