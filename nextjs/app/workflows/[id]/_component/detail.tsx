@@ -1,36 +1,20 @@
-//'use client';
-import React from 'react';
-import { Workflow } from '@models';
-import Button, { ButtonProps, buttonClasses } from '@mui/material/Button';
-import Card, { cardClasses } from '@mui/material/Card';
-import CardHeader, { cardHeaderClasses } from '@mui/material/CardHeader';
-import {
-  Avatar,
-  Chip,
-  IconButton,
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-} from '@mui/material';
-import {
-  ButtonGroup,
-  ClickAwayListener,
-  Grow,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
-  MenuList,
-  Paper,
-  Popper,
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-//import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { styled } from '@mui/system';
+'use client';
 
+import React from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
+import { Workflow, User as UserModel } from '@models';
+import Button, { buttonClasses } from '@mui/material/Button';
+import Card, { cardClasses } from '@mui/material/Card';
+import { Chip, Stack, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import { styled } from '@mui/system';
+import { Operators } from 'types/enum';
+
+import Approver from './approver';
+import NodeActionButton from './node-action';
+import { useUserDialog, DialogFormType } from './selector';
+
+const jointLineSize = '2.2rem';
 const NodeRoot = styled('div')({
   display: 'flex',
   '&:first-child': {
@@ -43,12 +27,12 @@ const NodeRoot = styled('div')({
     '&:not(.joint)': {
       width: '15em',
     },
-    marginLeft: '2.2rem',
+    marginLeft: jointLineSize,
 
     position: 'relative',
     '&::before': {
       content: '""',
-      width: '2.2rem',
+      width: jointLineSize,
       display: 'block',
       position: 'absolute',
       top: '30px',
@@ -72,34 +56,115 @@ const NodeRoot = styled('div')({
 
 type Props = {
   data: Workflow;
+  users: User[];
   deleteWorkflow: () => void;
   addNode: () => void;
 };
 
-const WorkflowDetail: React.FC<Props> = ({ data }) => {
+type Node = {
+  id?: number;
+  uid: number | string;
+  nodeLv: number;
+  operator: Operator;
+  isRoot?: boolean;
+  isReaf?: boolean;
+  approvers: Approver[];
+  childNode?: Node;
+};
+type Approver = {
+  id?: number;
+  uid: number | string;
+  orderNo: number;
+  approver: User;
+};
+type User = Required<Pick<UserModel, 'id' | 'nickname'>>;
+
+const demoData: Node[] = [
+  {
+    id: 1,
+    uid: 1,
+    nodeLv: 1,
+    operator: Operators.Or,
+    isRoot: true,
+    approvers: [
+      {
+        id: 101,
+        uid: 101,
+        orderNo: 1,
+        approver: { nickname: 'Jack', id: 1 },
+      },
+      {
+        id: 102,
+        uid: 102,
+        orderNo: 2,
+        approver: { nickname: 'Bob', id: 2 },
+      },
+    ],
+  },
+  {
+    id: 2,
+    uid: 2,
+    nodeLv: 2,
+    operator: Operators.And,
+    isReaf: true,
+    approvers: [
+      {
+        id: 103,
+        uid: 103,
+        orderNo: 1,
+        approver: { nickname: 'Jesse', id: 4 },
+      },
+    ],
+  },
+];
+
+const WorkflowDetail: React.FC<Props> = ({ data, users }) => {
   console.log('data', data);
-  const [list, setList] = React.useState<number[]>([1]);
+
+  const [nodes, setNodes] = React.useState<Node[]>(demoData);
+
   const onNodeAddClick = (beforeIndex: number) => {
-    setList((state) => {
-      if (beforeIndex >= state.length - 1) {
-        return [...state, state.length + 1];
+    setNodes((state) => {
+      const uid = Date.now();
+      const isReaf = beforeIndex >= state.length - 1;
+      const newNode: Node = {
+        uid,
+        nodeLv: beforeIndex + 1,
+        operator: Operators.And,
+        isReaf,
+        approvers: [],
+      };
+
+      if (isReaf) {
+        state[state.length - 1].isReaf = false;
+        return [...state, newNode];
       }
+
+      const afterNodes = state.slice(beforeIndex + 1);
       return [
         ...state.slice(0, beforeIndex + 1),
-        state.length + 1,
-        ...state.slice(beforeIndex),
+        newNode,
+        ...afterNodes.map((node) => ({ ...node, nodeLv: node.nodeLv })),
       ];
     });
   };
 
   const onNodeDeleteClick = (targetIndex: number) => {
-    setList((state) => state.filter((_, index) => index !== targetIndex));
-  }
+    setNodes((state) => state.filter((_, index) => index !== targetIndex));
+  };
 
   return (
     <>
-      {list.map((item, key) => (
-        <Node key={key} id={item} onNodeAddClick={() => onNodeAddClick(key)} onNodeDeleteClick={(list.length <= 1) ? undefined : () => onNodeDeleteClick(key)} />
+      {nodes.map((node, index) => (
+        <Node
+          key={node.uid}
+          data={node}
+          users={users}
+          onNodeAddClick={() => onNodeAddClick(index)}
+          onNodeDeleteClick={
+            nodes.length <= 1 ? undefined : () => onNodeDeleteClick(index)
+          }
+        />
       ))}
     </>
   );
@@ -108,56 +173,109 @@ const WorkflowDetail: React.FC<Props> = ({ data }) => {
 export default WorkflowDetail;
 
 export type NodeProps = {
-  id: number;
+  data: Node;
   onNodeAddClick?: React.MouseEventHandler<HTMLButtonElement>; //(beforeNodeId: number) => void;
   onSelectorClick?: (nodeId: number) => void;
   onNodeDeleteClick?: () => void;
-};
+} & Pick<Props, 'users'>;
 
 const Node: React.FC<NodeProps> = (props) => {
   //const { id, onNodeAddClick, onSelectorClick } = props;
-  const { onNodeAddClick, onNodeDeleteClick } = props;
+  const { data, users, onNodeAddClick, onNodeDeleteClick } = props;
 
-  const [list, setList] = React.useState<number[]>([]);
+  const [approvers, setApprovers] = React.useState<Approver[]>(data.approvers);
+
+  /**
+   * user selector
+   */
+  const userMethods = useForm<DialogFormType>();
+  const { watch: userWatch, reset } = userMethods;
+  React.useEffect(() => {
+    const subscription = userWatch(({ user }, { name }) => {
+      console.log(name, user);
+      if (name !== 'user' || !user) return;
+
+      setApprovers((state) => {
+        const newId = Date.now();
+        const newApprover: Approver = {
+          uid: 'app' + newId,
+          orderNo: state.length + 1,
+          approver: {
+            id: user.id || newId, // dummy
+            nickname: user.nickname || 'dummy ' + newId,
+          },
+        };
+        return [...state, newApprover];
+      });
+      reset();
+    });
+    return () => subscription.unsubscribe();
+  }, [userWatch, reset]);
+
+  const selectableUsers = React.useMemo(
+    () =>
+      users.filter((user) =>
+        approvers.every((item) => item.approver.id !== user.id)
+      ),
+    [approvers, users]
+  );
+  const [userDialog, setDialogOpen] = useUserDialog(selectableUsers);
 
   const onPersonAddClick = React.useMemo(() => {
-    if (list.length < 3) {
-      return () => setList((state) => [...state, state.length]);
+    if (approvers.length < 3) {
+      return () => setDialogOpen(true);
     }
-  }, [list.length]);
+  }, [approvers.length, setDialogOpen]);
+
   const handleRemoveClick = (removeIndex: number) => {
-    setList((state) => state.filter((_, index) => index !== removeIndex));
+    setApprovers((state) => {
+      return state
+        .map((item, index) => {
+          if (index === removeIndex) {
+            item.orderNo = 0;
+          } else if (index > removeIndex) {
+            item.orderNo = index;
+          }
+          return item;
+        })
+        .filter((approver) => approver.orderNo > 0);
+    });
   };
+
+  React.useEffect(() => console.log('applovers', approvers), [approvers]);
 
   const ope = 'AND';
   return (
     <NodeRoot>
+      <FormProvider {...userMethods}>{userDialog}</FormProvider>
       <div className='node'>
         <Card>
           <Stack spacing={1}>
-            <Operator disabled={list.length === 0} />
-            {list.map((item, index) => {
+            <Operator disabled={approvers.length === 0} />
+            {approvers.map((approver, index) => {
               return (
-                <>
+                <React.Fragment key={approver.uid}>
                   <Approver
-                    key={index}
-                    nickname={'nickname' + item}
+                    nickname={approver.approver.nickname}
                     onRemoveClick={() => handleRemoveClick(index)}
                   />
-                  {index !== list.length - 1 && (
+                  {index !== approvers.length - 1 && (
                     <Chip size='small' label={ope} />
                   )}
-                </>
+                </React.Fragment>
               );
             })}
 
-            <NodeActionButton onPersonAddClick={onPersonAddClick} onNodeDeleteClick={onNodeDeleteClick} />
+            <NodeActionButton
+              onPersonAddClick={onPersonAddClick}
+              onNodeDeleteClick={onNodeDeleteClick}
+            />
             {/*
             <Button
               variant='outlined'
               aria-label='add-approver'
               onClick={onPersonAddClick}
-              disabled={list.length >= 3}
+              disabled={approvers.length >= 3}
             >
               <PersonAddIcon />
             </Button>
@@ -169,7 +287,7 @@ const Node: React.FC<NodeProps> = (props) => {
         <Button
           variant='outlined'
           onClick={onNodeAddClick}
-          disabled={list.length === 0}
+          disabled={approvers.length === 0}
         >
           <AddIcon fontSize='large' />
         </Button>
@@ -178,194 +296,6 @@ const Node: React.FC<NodeProps> = (props) => {
   );
 };
 
-const options: {
-  label: string;
-  element: React.ReactNode;
-  variant?: ButtonProps['variant'];
-}[] = [
-  {
-    label: 'ADD',
-    element: <PersonAddIcon />,
-    variant: 'outlined',
-  },
-  {
-    label: 'NODE DELETE',
-    element: <DeleteSweepIcon />,
-    variant: 'contained',
-  },
-];
-
-type NodeActionButtonProps = {
-  onPersonAddClick?: () => void;
-  onNodeDeleteClick?: () => void;
-};
-const NodeActionButton: React.FC<NodeActionButtonProps> = ({
-  onPersonAddClick,
-  onNodeDeleteClick,
-}) => {
-  /*
-  const options: {
-    label: string;
-    element: React.ReactNode;
-    variant?: ButtonProps['variant'];
-    disabled?: ButtonProps['disabled'];
-    onClick?: ButtonProps['onClick'];
-  }[] = [
-    {
-      label: 'ADD',
-      element: <PersonAddIcon />,
-      variant: 'outlined',
-      disabled: !onPersonAddClick,
-      onClick: onPersonAddClick && (() => onPersonAddClick()),
-    },
-    {
-      label: 'NODE DELETE',
-      element: <DeleteSweepIcon />,
-      variant: 'contained',
-      disabled: !onNodeDeleteClick,
-      onClick: onNodeDeleteClick && (() => onNodeDeleteClick()),
-    },
-  ];
-  */
-  const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef<HTMLDivElement>(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
-
-  const hancleClick = React.useCallback((selected: number) => {
-    if (options[selected].label === 'ADD') {
-      if (onPersonAddClick) return () => onPersonAddClick();
-    } else {
-      if (onNodeDeleteClick) return () => onNodeDeleteClick();
-    }
-  }, [onPersonAddClick, onNodeDeleteClick])
-
-  const handleMenuItemClick = (
-    event: React.MouseEvent<HTMLLIElement, MouseEvent>,
-    index: number
-  ) => {
-    setSelectedIndex(index);
-    setOpen(false);
-  };
-
-  const handleToggle = () => {
-    setOpen((prevOpen) => !prevOpen);
-  };
-
-  const handleClose = (event: Event) => {
-    if (
-      anchorRef.current &&
-      anchorRef.current.contains(event.target as HTMLElement)
-    ) {
-      return;
-    }
-
-    setOpen(false);
-  };
-
-  return (
-    <>
-      <ButtonGroup
-        variant='text'
-        ref={anchorRef}
-        aria-label='split button'
-        fullWidth
-      >
-        <Button
-          variant={options[selectedIndex].variant}
-          disabled={!hancleClick(selectedIndex)}
-          onClick={hancleClick(selectedIndex)}
-          sx={{ borderRight: '0px' }}
-        >
-          {options[selectedIndex].element}
-        </Button>
-
-        <Button
-          size='small'
-          variant={options[selectedIndex].variant}
-          aria-controls={open ? 'split-button-menu' : undefined}
-          aria-expanded={open ? 'true' : undefined}
-          aria-label='select merge strategy'
-          aria-haspopup='menu'
-          onClick={handleToggle}
-          fullWidth={false}
-        >
-          <ArrowDropDownIcon />
-        </Button>
-      </ButtonGroup>
-      <Popper
-        sx={{
-          zIndex: 1,
-          paddingX: '1rem',
-          width: '100%',
-        }}
-        open={open}
-        anchorEl={anchorRef.current}
-        role={undefined}
-        transition
-        disablePortal
-      >
-        {({ TransitionProps, placement }) => (
-          <Grow
-            {...TransitionProps}
-            style={{
-              transformOrigin:
-                placement === 'bottom' ? 'center top' : 'center bottom',
-            }}
-          >
-            <Paper>
-              <ClickAwayListener onClickAway={handleClose}>
-                <MenuList id='split-button-menu' autoFocusItem>
-                  {options.map((option, index) => (
-                    <MenuItem
-                      key={index}
-                      divider
-                      disabled={!hancleClick(index)}
-                      selected={index === selectedIndex}
-                      onClick={(event) => handleMenuItemClick(event, index)}
-                    >
-                      <ListItemIcon>{option.element}</ListItemIcon>
-                      <ListItemText>{option.label}</ListItemText>
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </ClickAwayListener>
-            </Paper>
-          </Grow>
-        )}
-      </Popper>
-    </>
-  );
-};
-
-const ApproverCard = styled(CardHeader)({
-  [`.${cardHeaderClasses.action}`]: {
-    margin: 0,
-  },
-});
-
-type ApproverProps = {
-  nickname: string;
-  onRemoveClick?: React.MouseEventHandler<HTMLButtonElement>;
-};
-const Approver: React.FC<ApproverProps> = ({ nickname, onRemoveClick }) => {
-  return (
-    <Card>
-      <ApproverCard
-        avatar={<Avatar aria-label='approver' alt={nickname} />}
-        action={
-          <IconButton
-            aria-label='approver-delete'
-            size='small'
-            onClick={onRemoveClick}
-          >
-            <HighlightOffIcon />
-          </IconButton>
-        }
-        title={nickname}
-      />
-    </Card>
-  );
-};
 type OperatorProps = {
   disabled?: boolean;
 };

@@ -1,23 +1,24 @@
 import { PageNotFoundError } from 'next/dist/shared/lib/utils';
 import Client, { Props } from './client';
-import { Workflow } from '@models';
+import { Workflow, User } from '@models';
 import { Card, CardContent, CardHeader, Container, Stack } from '@mui/material';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 
 export default async function Page({ params }: { params: { id: string } }) {
-  const props = await getWorkflows(params.id);
+  const workflow = await getWorkflow(params.id);
+  const users = await getUsers();
 
   return (
     <>
       <Container component={Card} maxWidth='lg' sx={{ minHeight: '50vh', mt: '0.8rem' }} elevation={2}>
         <CardHeader
           avatar={<AccountTreeIcon fontSize='large' color='action' />}
-          title={props.workflow.name}
+          title={workflow.name}
           titleTypographyProps={{ variant: "h4" }}
-          subheader={props.workflow.name}
+          subheader={workflow.name}
         />
         <CardContent component={Stack} direction="row" sx={{ overflowX: 'auto' }}>
-          <Client {...props} />
+          <Client {...{ workflow, users }} />
         </CardContent>
       </Container>
     </>
@@ -30,11 +31,18 @@ export async function generateStaticParams() {
   return keys;
 }
 */
-const getWorkflows = async (id: string): Promise<Props> => {
+const getWorkflow = async (id: string): Promise<Props['workflow']> => {
   const workflow = (await Workflow.findByPk(id))?.toJSON();
   if (!workflow) {
     throw new PageNotFoundError('not found');
-  } else {
-    return { workflow };
   }
+  return workflow;
+};
+
+const getUsers = async (): Promise<Props['users']> => {
+  const users = (await User.findAll()).map((item) => {
+    const model = item.toJSON();
+    return { ...model, id: model.id || 0} as User & {id: number};
+  });
+  return users.filter((model) => !!model.id);
 };

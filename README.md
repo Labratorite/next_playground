@@ -28,7 +28,8 @@
       ```
 - 4. `npm run dev`
 
-
+#### 制限事項
+- Sequelizeでin-memoryのDBを使用したdemo起動ができないか試したが、メモリが維持できなかった。良い方法がないか考え中
 
 ### Setup Record
 #### 1. Devcontainer (https://note.com/shift_tech/n/nf9c647e5264c)
@@ -181,3 +182,5 @@ We're working hard on making Sequelize a breeze to use in TypeScript. Some parts
 
 - `npm install @mui/material @emotion/react @emotion/styled`
 - `npm install @mui/icons-material @mui/x-data-grid`
+- `npm install react-hook-form`
+
