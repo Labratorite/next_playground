@@ -28,9 +28,6 @@
       ```
 - 4. `npm run dev`
 
-#### 制限事項
-- Sequelizeでin-memoryのDBを使用したdemo起動ができないか試したが、メモリが維持できなかった。良い方法がないか考え中
-
 ### Setup Record
 #### 1. Devcontainer (https://note.com/shift_tech/n/nf9c647e5264c)
 - 開発コンテナー構成ファイルを追加

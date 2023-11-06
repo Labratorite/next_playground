@@ -1,20 +1,23 @@
+import { Metadata } from 'next';
 import Link from "next/link";
-import Head from "next/head";
 import { getSortedArticlesData } from 'lib/articles';
 import Date from 'components/date';
 import styles from "styles/Home.module.css";
 import utilStyles from "styles/utils.module.scss";
 import Image from "next/image";
 
+if (process.env.USE_IN_MEMORY_STORAGE === "true") {
+  require('@models');
+}
+
+export const metadata: Metadata = {
+  title: 'Create Next App',
+};
+
 export default function Home() {
   const allPostsData = getSortedArticlesData();
   return (
     <>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
       <article className={utilStyles.headingMd}>
         <p>
           {"Hi, this is KK, I'm a software enginer. I'm working on tutorial of Next.js based on Page Router."}

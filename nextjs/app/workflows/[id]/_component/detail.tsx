@@ -129,7 +129,7 @@ const WorkflowDetail: React.FC<Props> = ({ data, users }) => {
       const isReaf = beforeIndex >= state.length - 1;
       const newNode: Node = {
         uid,
-        nodeLv: beforeIndex + 1,
+        nodeLv: beforeIndex + 2,
         operator: Operators.And,
         isReaf,
         approvers: [],
@@ -156,15 +156,15 @@ const WorkflowDetail: React.FC<Props> = ({ data, users }) => {
   return (
     <>
       {nodes.map((node, index) => (
-        <Node
-          key={node.uid}
-          data={node}
-          users={users}
-          onNodeAddClick={() => onNodeAddClick(index)}
-          onNodeDeleteClick={
-            nodes.length <= 1 ? undefined : () => onNodeDeleteClick(index)
-          }
-        />
+          <Node
+            key={node.uid}
+            data={node}
+            users={users}
+            onNodeAddClick={() => onNodeAddClick(index)}
+            onNodeDeleteClick={
+              nodes.length <= 1 ? undefined : () => onNodeDeleteClick(index)
+            }
+          />
       ))}
     </>
   );
@@ -242,7 +242,10 @@ const Node: React.FC<NodeProps> = (props) => {
     });
   };
 
-  React.useEffect(() => console.log('applovers', approvers), [approvers]);
+  const jointBox = React.useRef<HTMLDivElement>(null);
+  React.useLayoutEffect(() =>
+    jointBox?.current?.scrollIntoView()
+  , []);
 
   const ope = 'AND';
   return (
@@ -283,11 +286,11 @@ const Node: React.FC<NodeProps> = (props) => {
           </Stack>
         </Card>
       </div>
-      <div className='node joint'>
+      <div className='node joint' ref={jointBox}>
         <Button
           variant='outlined'
           onClick={onNodeAddClick}
-          disabled={approvers.length === 0}
+          disabled={approvers.length === 0 && data.isReaf}
         >
           <AddIcon fontSize='large' />
         </Button>

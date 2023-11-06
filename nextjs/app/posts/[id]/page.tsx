@@ -1,9 +1,19 @@
-import Head from 'next/head';
+import { Metadata } from 'next';
 import { getSortedArticlesData, getArticleData, ArticleData } from 'lib/articles';
 import Date from 'components/date';
 import utilStyles from 'styles/utils.module.scss';
 
 type PageParams = Pick<ArticleData, 'id'>;
+
+export async function generateMetadata({ params }: { params: PageParams }): Promise<Metadata> {
+  // read route params then fetch data
+  const { id } = params;
+  const article = await getArticleData(id);
+  // return an object
+  return {
+    title: article.title,
+  };
+}
 
 export default async function Article({ params }: { params: PageParams }) {
   const { id } = params;
@@ -11,9 +21,6 @@ export default async function Article({ params }: { params: PageParams }) {
 
   return (
     <>
-      <Head>
-        <title>{article.title}</title>
-      </Head>
       <article>
         <h1 className={utilStyles.headingXl}>{article.title}</h1>
         <div className={utilStyles.lightText}>
