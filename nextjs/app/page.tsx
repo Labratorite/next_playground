@@ -6,10 +6,6 @@ import styles from "styles/Home.module.css";
 import utilStyles from "styles/utils.module.scss";
 import Image from "next/image";
 
-if (process.env.USE_IN_MEMORY_STORAGE === "true") {
-  require('@models');
-}
-
 export const metadata: Metadata = {
   title: 'Create Next App',
 };

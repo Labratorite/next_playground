@@ -31,7 +31,6 @@ const initSequelize = () => {
       models: [process.cwd() + '/db/models/*.model.ts'],
       modelMatch,
       */
-    logging: true,
   });
 };
 
@@ -73,8 +72,7 @@ if (!global.sequelize) {
 }
 
 const initSchema = () => {
-  if (process.env.USE_IN_MEMORY_STORAGE !== 'true' || !beforeInit) return;
-
+  if (config.storage !== ':memory:' || !beforeInit) return;
   return global.sequelize.sync().then((_this) => {
     Seeders(_this.getQueryInterface());
   });
@@ -83,7 +81,7 @@ const initSchema = () => {
 // this is private study project. basicly running on sqlite.
 // it can remigration every time.
 //https://sequelize.org/docs/v6/core-concepts/model-basics/
-if (process.env.USE_IN_MEMORY_STORAGE === 'true' && beforeInit) {
+if (config.storage === ':memory:' && beforeInit) {
   console.warn('init schema');
   initSchema();
 }

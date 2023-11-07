@@ -7,6 +7,7 @@ const mysql = {
   "port": process.env.DB_PORT,
   "host": "localhost",
   "dialect": "mysql",
+  "storage": undefined,
   "migrationStorageTableSchema": "_sequelize"
 };
 

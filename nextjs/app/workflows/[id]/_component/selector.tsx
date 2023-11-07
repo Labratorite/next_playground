@@ -11,7 +11,12 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Dialog, { dialogClasses } from '@mui/material/Dialog';
 import PersonIcon from '@mui/icons-material/Person';
 import { blue } from '@mui/material/colors';
-import { useFormContext } from 'react-hook-form';
+import {
+  useForm,
+  useFormContext,
+  FormProvider,
+  UseFormReturn,
+} from 'react-hook-form';
 import { TextField } from '@mui/material';
 
 //const emails = ['username@gmail.com', 'user02@gmail.com'];
@@ -43,17 +48,34 @@ const UserDialog: React.FC<UserDialogProps> = (props) => {
     setOpen(false);
   };
 
-  const [filter, setFilter] = React.useState<string>()
+  const [filter, setFilter] = React.useState<string>();
   const filterChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
     setFilter(event.target.value);
-  }
-  const selectables = React.useMemo(() => filter && users.filter(item => item.nickname.indexOf(filter)>=0) || users, [users, filter]);
+  };
+  const selectables = React.useMemo(
+    () =>
+      (filter && users.filter((item) => item.nickname.indexOf(filter) >= 0)) ||
+      users,
+    [users, filter]
+  );
   return (
-    <Dialog onClose={handleClose} open={open} fullWidth maxWidth='xs' sx={{ [` .${dialogClasses.paper}`]: { minHeight: '60vh' }}}>
+    <Dialog
+      onClose={handleClose}
+      open={open}
+      fullWidth
+      maxWidth='xs'
+      sx={{ [` .${dialogClasses.paper}`]: { minHeight: '60vh' } }}
+    >
       <DialogTitle>Set approver account</DialogTitle>
       <List sx={{ pt: 0 }}>
         <ListItem>
-          <TextField label="nickname" value={filter} onChange={filterChange} fullWidth size='small' />
+          <TextField
+            label='nickname'
+            value={filter}
+            onChange={filterChange}
+            fullWidth
+            size='small'
+          />
         </ListItem>
         {selectables.map((user) => (
           <ListItem disableGutters key={user.id}>
@@ -74,16 +96,24 @@ const UserDialog: React.FC<UserDialogProps> = (props) => {
 
 export default UserDialog;
 
-type UserDialogReturn = [JSX.Element, React.Dispatch<React.SetStateAction<boolean>>];
+type UserDialogReturn = [
+  JSX.Element,
+  React.Dispatch<React.SetStateAction<boolean>>,
+  UseFormReturn<DialogFormType>,
+];
 export const useUserDialog = (users: UserInfo[]) => {
   const [open, setOpen] = React.useState(false);
+  const userMethods = useForm<DialogFormType>();
 
   return React.useMemo<UserDialogReturn>(() => {
     return [
       <>
-        <UserDialog open={open} setOpen={setOpen} users={users} />
+        <FormProvider {...userMethods}>
+          <UserDialog open={open} setOpen={setOpen} users={users} />
+        </FormProvider>
       </>,
       setOpen,
+      userMethods,
     ];
-  }, [open, users]);
+  }, [open, users, userMethods]);
 };

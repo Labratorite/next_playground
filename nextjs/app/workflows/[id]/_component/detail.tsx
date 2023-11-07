@@ -1,23 +1,34 @@
 'use client';
 
 import React from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
-import { Workflow, User as UserModel } from '@models';
+import { animateScroll as scroller } from 'react-scroll';
+
 import Button, { buttonClasses } from '@mui/material/Button';
 import Card, { cardClasses } from '@mui/material/Card';
-import { Chip, Stack, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import {
+  CardContent,
+  Chip,
+  Stack,
+  ToggleButton,
+  ToggleButtonGroup,
+  Collapse,
+} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { styled } from '@mui/system';
+import clsx from 'clsx';
+import { TransitionGroup } from 'react-transition-group';
 import { Operators } from 'types/enum';
+import { Workflow, User as UserModel } from '@models';
+import * as self from './index';
 
 import Approver from './approver';
 import NodeActionButton from './node-action';
-import { useUserDialog, DialogFormType } from './selector';
+import { useUserDialog } from './selector';
 
 const jointLineSize = '2.2rem';
 const NodeRoot = styled('div')({
   display: 'flex',
-  '&:first-child': {
+  '&.root': {
     ' > div.node:first-child': {
       marginLeft: 0,
     },
@@ -47,7 +58,7 @@ const NodeRoot = styled('div')({
       marginTop: '15px',
     },
   },
-  '&:last-child': {
+  '&.reaf': {
     '.node.joint::before': {
       display: 'none',
     },
@@ -56,78 +67,19 @@ const NodeRoot = styled('div')({
 
 type Props = {
   data: Workflow;
-  users: User[];
+  users: ReadonlyModel<UserModel>[];
   deleteWorkflow: () => void;
   addNode: () => void;
 };
 
-type Node = {
-  id?: number;
-  uid: number | string;
-  nodeLv: number;
-  operator: Operator;
-  isRoot?: boolean;
-  isReaf?: boolean;
-  approvers: Approver[];
-  childNode?: Node;
-};
-type Approver = {
-  id?: number;
-  uid: number | string;
-  orderNo: number;
-  approver: User;
-};
-type User = Required<Pick<UserModel, 'id' | 'nickname'>>;
-
-const demoData: Node[] = [
-  {
-    id: 1,
-    uid: 1,
-    nodeLv: 1,
-    operator: Operators.Or,
-    isRoot: true,
-    approvers: [
-      {
-        id: 101,
-        uid: 101,
-        orderNo: 1,
-        approver: { nickname: 'Jack', id: 1 },
-      },
-      {
-        id: 102,
-        uid: 102,
-        orderNo: 2,
-        approver: { nickname: 'Bob', id: 2 },
-      },
-    ],
-  },
-  {
-    id: 2,
-    uid: 2,
-    nodeLv: 2,
-    operator: Operators.And,
-    isReaf: true,
-    approvers: [
-      {
-        id: 103,
-        uid: 103,
-        orderNo: 1,
-        approver: { nickname: 'Jesse', id: 4 },
-      },
-    ],
-  },
-];
-
-const WorkflowDetail: React.FC<Props> = ({ data, users }) => {
-  console.log('data', data);
-
-  const [nodes, setNodes] = React.useState<Node[]>(demoData);
+const WorkflowDetail: React.FC<Props> = ({ users }) => {
+  const [nodes, setNodes] = React.useState<self.Node[]>(self.demoData);
 
   const onNodeAddClick = (beforeIndex: number) => {
     setNodes((state) => {
       const uid = Date.now();
       const isReaf = beforeIndex >= state.length - 1;
-      const newNode: Node = {
+      const newNode: self.Node = {
         uid,
         nodeLv: beforeIndex + 2,
         operator: Operators.And,
@@ -150,22 +102,34 @@ const WorkflowDetail: React.FC<Props> = ({ data, users }) => {
   };
 
   const onNodeDeleteClick = (targetIndex: number) => {
-    setNodes((state) => state.filter((_, index) => index !== targetIndex));
+    setNodes((state) => {
+      const newNodes = state.filter((_, index) => index !== targetIndex);
+      if (targetIndex === 0) newNodes[0].isRoot = true;
+      if (targetIndex > newNodes.length - 1) newNodes[newNodes.length - 1].isReaf = true;
+      return newNodes;
+    });
   };
 
   return (
     <>
-      {nodes.map((node, index) => (
-          <Node
-            key={node.uid}
-            data={node}
-            users={users}
-            onNodeAddClick={() => onNodeAddClick(index)}
-            onNodeDeleteClick={
-              nodes.length <= 1 ? undefined : () => onNodeDeleteClick(index)
-            }
-          />
-      ))}
+      <TransitionGroup
+        component={CardContent}
+        id="scrollContainer"
+        sx={{ display: 'flex',  overflowX: 'auto', pb: '3rem' }}
+      >
+        {nodes.map((node, index) => (
+          <Collapse key={node.uid} orientation='horizontal' sx={{ flexShrink: 0 }}>
+            <Node
+              data={node}
+              users={users}
+              onNodeAddClick={() => onNodeAddClick(index)}
+              onNodeDeleteClick={
+                nodes.length <= 1 ? undefined : () => onNodeDeleteClick(index)
+              }
+            />
+          </Collapse>
+        ))}
+      </TransitionGroup>
     </>
   );
 };
@@ -173,22 +137,27 @@ const WorkflowDetail: React.FC<Props> = ({ data, users }) => {
 export default WorkflowDetail;
 
 export type NodeProps = {
-  data: Node;
+  data: self.Node;
   onNodeAddClick?: React.MouseEventHandler<HTMLButtonElement>; //(beforeNodeId: number) => void;
-  onSelectorClick?: (nodeId: number) => void;
   onNodeDeleteClick?: () => void;
 } & Pick<Props, 'users'>;
 
 const Node: React.FC<NodeProps> = (props) => {
-  //const { id, onNodeAddClick, onSelectorClick } = props;
   const { data, users, onNodeAddClick, onNodeDeleteClick } = props;
 
-  const [approvers, setApprovers] = React.useState<Approver[]>(data.approvers);
+  const [approvers, setApprovers] = React.useState<self.Approver[]>(data.approvers);
 
   /**
    * user selector
    */
-  const userMethods = useForm<DialogFormType>();
+  const selectableUsers = React.useMemo(
+    () =>
+      users.filter((user) =>
+        approvers.every((item) => item.approver.id !== user.id)
+      ),
+    [approvers, users]
+  );
+  const [userDialog, setDialogOpen, userMethods] = useUserDialog(selectableUsers);
   const { watch: userWatch, reset } = userMethods;
   React.useEffect(() => {
     const subscription = userWatch(({ user }, { name }) => {
@@ -197,7 +166,7 @@ const Node: React.FC<NodeProps> = (props) => {
 
       setApprovers((state) => {
         const newId = Date.now();
-        const newApprover: Approver = {
+        const newApprover: self.Approver = {
           uid: 'app' + newId,
           orderNo: state.length + 1,
           approver: {
@@ -211,15 +180,6 @@ const Node: React.FC<NodeProps> = (props) => {
     });
     return () => subscription.unsubscribe();
   }, [userWatch, reset]);
-
-  const selectableUsers = React.useMemo(
-    () =>
-      users.filter((user) =>
-        approvers.every((item) => item.approver.id !== user.id)
-      ),
-    [approvers, users]
-  );
-  const [userDialog, setDialogOpen] = useUserDialog(selectableUsers);
 
   const onPersonAddClick = React.useMemo(() => {
     if (approvers.length < 3) {
@@ -242,18 +202,15 @@ const Node: React.FC<NodeProps> = (props) => {
     });
   };
 
-  const jointBox = React.useRef<HTMLDivElement>(null);
-  React.useLayoutEffect(() =>
-    jointBox?.current?.scrollIntoView()
-  , []);
+  React.useLayoutEffect(() => scroller.scrollTo(1000, { horizontal: true, containerId: 'scrollContainer' }), []);
 
   const ope = 'AND';
   return (
-    <NodeRoot>
-      <FormProvider {...userMethods}>{userDialog}</FormProvider>
+    <NodeRoot className={clsx({ root: data.isRoot, reaf: data.isReaf })}>
+      {userDialog}
       <div className='node'>
         <Card>
-          <Stack spacing={1}>
+          <Stack spacing={2}>
             <Operator disabled={approvers.length === 0} />
             {approvers.map((approver, index) => {
               return (
@@ -286,7 +243,7 @@ const Node: React.FC<NodeProps> = (props) => {
           </Stack>
         </Card>
       </div>
-      <div className='node joint' ref={jointBox}>
+      <div className='node joint'>
         <Button
           variant='outlined'
           onClick={onNodeAddClick}
