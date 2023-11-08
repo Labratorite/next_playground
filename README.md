@@ -165,6 +165,9 @@ We're working hard on making Sequelize a breeze to use in TypeScript. Some parts
 - https://nextjs.org/docs/pages/building-your-application/upgrading/app-router-migration#migrating-from-pages-to-app
 - app routings時、Static レンダリングのためにはネイティブの`fetch`で`{ cache: 'no-store' }`を指定して実行する必要があるが、ネイティブの`fetch`は相対urlを許容していない
 
+### 8. in-memory demo 起動対応
+- instrumentation.ts にてSequelizeの初期化
+
 ### その他
 - `npm i swr`
 - `npm i date-fns`

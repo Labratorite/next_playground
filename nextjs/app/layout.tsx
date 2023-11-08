@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import ThemeRegistry from 'components/theme-registry';
 import Layout from 'components/layout';
 import '../styles/global.scss';
 
@@ -17,7 +18,9 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body>
-        <Layout>{children}</Layout>
+        <ThemeRegistry options={{ key: 'mui' }}>
+          <Layout>{children}</Layout>
+        </ThemeRegistry>
       </body>
     </html>
   );

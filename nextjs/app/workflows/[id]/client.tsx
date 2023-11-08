@@ -1,24 +1,22 @@
 'use client';
 
 import React from 'react';
-import { Workflow, User } from '@models';
+import type { Workflow, User } from '@models';
 import Detail from './_component/detail'
+import { demoData } from './_component/index';
+import NodeForm from './_component/form';
 
 export type Props = {
   workflow: Workflow;
-  users: (User & {id: number})[];
+  users: ReadonlyModel<User>[];
 };
 
 const PageClient: React.FC<Props> = (props) => {
-  const { workflow, users } = props;
-
-  const dummy = () => {
-    console.log('dummy');
-  };
+  const { users } = props;
   return (
-    <>
-      <Detail data={workflow} users={users} deleteWorkflow={dummy} addNode={dummy} />
-    </>
+    <NodeForm nodes={demoData}>
+      <Detail users={users} />
+    </NodeForm>
   );
 };
 export default PageClient;

@@ -95,7 +95,7 @@ const Page: React.FC<ValidProps> = (props) => {
   };
 
   const deleteWorkflow = async (rowId: string | number) => {
-    const res = await axios.delete(`/api/workflow/${rowId}`);
+    const res = await axios.delete(`/workflows/api/${rowId}`);
     console.log(res);
   };
 
