@@ -81,16 +81,14 @@ export default async function handler(
 }
 */
 const show = async (id: string) => {
-  const model = await Workflow.findByPk(id)
+  const model = await Workflow.findByPk(id);
   return model;
 }
 
 const destroy = async (id: string) => {
-  const model = await Workflow.findByPk(id)
+  const model = await Workflow.findByPk(id);
   if (model) {
-    await Workflow.destroy({
-      where: { id }
-    });
+    await model.destroy();
   }
   return model;
 }

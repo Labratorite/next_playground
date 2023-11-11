@@ -13,12 +13,14 @@ module.exports = {
         type: Sequelize.STRING
       },
       firstName: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       lastName: {
         type: Sequelize.STRING
       },
       email: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       createdAt: {

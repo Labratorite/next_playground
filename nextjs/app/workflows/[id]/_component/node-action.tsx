@@ -66,7 +66,7 @@ const NodeActionButton: React.FC<NodeActionButtonProps> = ({
   const anchorRef = React.useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] = React.useState<Action>('ADD');
 
-  const hancleClick = React.useCallback(
+  const handleClick = React.useCallback(
     (selected: Action) => {
       if (selected === 'ADD') {
         if (onPersonAddClick) return () => onPersonAddClick();
@@ -87,10 +87,18 @@ const NodeActionButton: React.FC<NodeActionButtonProps> = ({
 
   const handleMenuItemClick = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
-    index: Action
+    action: Action
   ) => {
-    setSelectedIndex(index);
     setOpen(false);
+    const handle = handleClick(action);
+    if (action === selectedIndex) {
+      handle && handle();
+    } else {
+      if (action === 'ADD') {
+        handle && handle();
+      }
+      setSelectedIndex(action);
+    }
   };
 
   const handleToggle = () => {
@@ -118,8 +126,8 @@ const NodeActionButton: React.FC<NodeActionButtonProps> = ({
       >
         <Button
           variant={options[selectedIndex].variant}
-          disabled={!hancleClick(selectedIndex)}
-          onClick={hancleClick(selectedIndex)}
+          disabled={!handleClick(selectedIndex)}
+          onClick={handleClick(selectedIndex)}
         >
           {options[selectedIndex].element}
         </Button>
@@ -164,7 +172,7 @@ const NodeActionButton: React.FC<NodeActionButtonProps> = ({
                     <MenuItem
                       key={key}
                       divider
-                      disabled={!hancleClick(key as Action)}
+                      disabled={!handleClick(key as Action)}
                       selected={key === selectedIndex}
                       onClick={(event) =>
                         handleMenuItemClick(event, key as Action)

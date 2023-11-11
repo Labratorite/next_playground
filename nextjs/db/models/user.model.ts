@@ -1,38 +1,32 @@
 'use strict';
-/*
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class User extends Model {
-    / **
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     * /
-    static associate(models) {
-      // define association here
-    }
-  }
-  User.init({
-    first_name: DataTypes.STRING,
-    last_name: DataTypes.STRING,
-    email: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'User',
-    underscored: true,
-  });
-  return User;
-};
-*/
-import {Model, Column, Table, DeletedAt, CreatedAt, UpdatedAt} from "sequelize-typescript";
+
+import { Optional } from 'sequelize';
+import {
+  Model,
+  Column,
+  DataType,
+  Table,
+  DeletedAt,
+  CreatedAt,
+  UpdatedAt,
+} from 'sequelize-typescript';
+
+export interface Userttributes {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  nickname: string;
+  fullName: string;
+}
+
+export interface UserCreationAttributes extends Optional<Userttributes, 'id' | 'fullName'> {}
 
 @Table({
   timestamps: true,
-  tableName: "Users",
+  tableName: 'Users',
 })
-export class User extends Model<User> {
+export class User extends Model<Userttributes, UserCreationAttributes> {
   @Column
   firstName!: string;
 
@@ -44,6 +38,11 @@ export class User extends Model<User> {
 
   @Column
   nickname!: string;
+
+  @Column({ type: DataType.VIRTUAL })
+  get fullName(): string {
+    return `${this.getDataValue('lastName')} ${this.getDataValue('firstName')}`;
+  }
   /*
   @Column
   birthday?: Date;

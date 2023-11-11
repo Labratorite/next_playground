@@ -30,17 +30,32 @@ export async function generateStaticParams() {
 }
 */
 const getWorkflow = async (id: string): Promise<Props['workflow']> => {
-  const workflow = (await Workflow.findByPk(id))?.toJSON();
+  const workflow = (await Workflow.findByPk(id, {
+    include: {
+      association: 'nodes',
+      include: [{
+        association: 'approvers',
+        include: [{
+          association: 'approver',
+          attributes: [
+            'id', 'nickname', 'firstName', 'lastName', 'fullName'
+          ]
+        }],
+      }],
+    },
+    order: [
+      ['nodes', 'nodeLv', 'ASC'],
+      ['nodes', 'approvers', 'orderNo', 'ASC'],
+    ],
+  }))?.toJSON();
   if (!workflow) {
     throw new PageNotFoundError('not found');
   }
-  return workflow;
+  // eager loading 時の戻り値の型が対応されていなかった。WorkflowAttributesが戻ってくる
+  // 一旦無理やり書き換え
+  return workflow as Props['workflow'];
 };
 
 const getUsers = async (): Promise<Props['users']> => {
-  const users = (await User.findAll()).map((item) => {
-    const model = item.toJSON();
-    return { ...model, id: model.id || 0} as User & {id: number};
-  });
-  return users.filter((model) => !!model.id);
+  return (await User.findAll()).map((item) => item.toJSON());
 };

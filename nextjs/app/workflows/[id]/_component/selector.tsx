@@ -18,10 +18,11 @@ import {
   UseFormReturn,
 } from 'react-hook-form';
 import { TextField } from '@mui/material';
+//import type { Userttributes } from '@models/user.model';
 
 //const emails = ['username@gmail.com', 'user02@gmail.com'];
 export type UserInfo = {
-  id: string | number;
+  id: number;
   nickname: string;
   image?: string;
 };

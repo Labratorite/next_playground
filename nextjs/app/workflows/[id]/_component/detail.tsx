@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { animateScroll as scroller } from 'react-scroll';
-import { Controller, useFormContext, useWatch } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import {
   Button,
   Card,
@@ -18,9 +18,8 @@ import AddIcon from '@mui/icons-material/Add';
 import clsx from 'clsx';
 import { TransitionGroup } from 'react-transition-group';
 import { Operators } from 'types/enum';
-import type { User as UserModel } from '@models';
-import type { Approver, Node, WorkflowNodeForm } from './index';
-
+import type { Userttributes } from '@models/user.model';
+import type { Approver, Node, WorkflowNodeForm } from './form';
 import { useNodeFieldArray, useApproverFieldArray } from './form';
 import ApproverCard from './approver';
 import NodeActionButton from './node-action';
@@ -28,32 +27,32 @@ import { useUserDialog } from './selector';
 import { NodeRoot } from './node.styled';
 
 type Props = {
-  users: ReadonlyModel<UserModel>[];
+  workflowId: number;
+  users: Userttributes[];
   deleteNode?: () => void;
   addNode?: () => void;
   update?: () => void;
 };
 
-const WorkflowDetail: React.FC<Props> = ({ users }) => {
+const WorkflowDetail: React.FC<Props> = ({ workflowId, users }) => {
   const { fields, remove, insert } = useNodeFieldArray();
 
-  console.log('fields', fields);
-
   const onNodeAddClick = (beforeIndex: number) => {
-    //const uid = Date.now();
     const insertIndex = beforeIndex + 1;
     const isReaf = insertIndex > fields.length - 1;
     const newNode: Node = {
+      workflowId,
       nodeLv: insertIndex + 1,
-      operator: Operators.And,
+      operator: null,
       isReaf,
       approvers: [],
     };
     insert(insertIndex, newNode);
+    // todo?: update nodeLv/isReaf/isRoot?
   };
 
   const onNodeDeleteClick = (targetIndex: number) => {
-    // todo:
+    // todo?: update nodeLv/isReaf/isRoot?
     remove(targetIndex);
   };
 
@@ -68,6 +67,7 @@ const WorkflowDetail: React.FC<Props> = ({ users }) => {
           <Collapse key={field.uid} orientation='horizontal' sx={{ flexShrink: 0 }}>
             <Node
               formIndex={index}
+              workflowId={workflowId}
               isReaf={fields.length - 1 === index}
               users={users}
               onNodeAddClick={() => onNodeAddClick(index)}
@@ -84,9 +84,9 @@ const WorkflowDetail: React.FC<Props> = ({ users }) => {
 
 export default WorkflowDetail;
 
-const useSelectableUser = (users: ReadonlyModel<UserModel>[], formIndex: number) => {
-  const { control } = useFormContext<WorkflowNodeForm>();
-  const approvers = useWatch({ control, name: `nodes.${formIndex}.approvers` });
+const useSelectableUser = (users: Userttributes[], formIndex: number) => {
+  const { watch } = useFormContext<WorkflowNodeForm>();
+  const approvers = watch(`nodes.${formIndex}.approvers`);
   return React.useMemo(
     () => users.filter((user) => approvers.every((item) => item.approver.id !== user.id)),
     [approvers, users]
@@ -95,13 +95,15 @@ const useSelectableUser = (users: ReadonlyModel<UserModel>[], formIndex: number)
 
 export type NodeProps = {
   formIndex: number;
+  workflowId: number;
   isReaf: boolean;
   onNodeAddClick?: React.MouseEventHandler<HTMLButtonElement>; //(beforeNodeId: number) => void;
   onNodeDeleteClick?: () => void;
 } & Pick<Props, 'users'>;
 
 const Node: React.FC<NodeProps> = (props) => {
-  const { formIndex, isReaf, users, onNodeAddClick, onNodeDeleteClick } = props;
+  const APPROVER_MAX_COUNT = 3;
+  const { formIndex, workflowId, isReaf, users, onNodeAddClick, onNodeDeleteClick } = props;
 
   const { control } = useFormContext<WorkflowNodeForm>();
 
@@ -111,28 +113,29 @@ const Node: React.FC<NodeProps> = (props) => {
    * user selector
    */
   const selectableUsers = useSelectableUser(users, formIndex);
-  const [userDialog, setDialogOpen, { watch: userWatch, reset }] =
-    useUserDialog(selectableUsers);
+  const [userDialog, setDialogOpen, dialogMethods] = useUserDialog(selectableUsers);
+  const { watch: userWatch, reset } = dialogMethods;
+
   React.useEffect(() => {
     const subscription = userWatch(({ user }, { name }) => {
-      console.log(name, user);
       if (name !== 'user' || !user) return;
       const newApprover: Approver = {
+        workflowId,
         orderNo: fields.length + 1,
+        approverId: user.id!,
         approver: {
-          id: user.id,
+          id: user.id!,
           nickname: user.nickname || '',
         },
       };
       append(newApprover);
-
       reset();
     });
     return () => subscription.unsubscribe();
-  }, [fields, append, userWatch, reset]);
+  }, [workflowId, fields, append, userWatch, reset]);
 
   const onPersonAddClick = React.useMemo(() => {
-    if (fields.length < 3) {
+    if (fields.length < APPROVER_MAX_COUNT) {
       return () => setDialogOpen(true);
     }
   }, [fields.length, setDialogOpen]);
@@ -152,17 +155,17 @@ const Node: React.FC<NodeProps> = (props) => {
       <div className='node'>
         <Card>
           <Stack spacing={2}>
-            <Operator formIndex={formIndex} disabled={fields.length === 0} />
+            <Operator formIndex={formIndex} disabled={fields.length <= 1} />
             {fields.map((field, index) => {
               return (
                 <React.Fragment key={field.uid}>
                   {index !== 0 && <OperatorChip formIndex={formIndex} />}
                   <Controller
-                    name={`nodes.${formIndex}.approvers.${index}`}
+                    name={`nodes.${formIndex}.approvers.${index}.approver`}
                     control={control}
                     render={({ field: { value } }) => (
                       <ApproverCard
-                        nickname={value.approver.nickname}
+                        nickname={value.nickname}
                         onRemoveClick={() => handleRemoveClick(index)}
                       />
                     )}
@@ -206,12 +209,16 @@ type OperatorProps = {
   formIndex: number;
 };
 const Operator: React.FC<OperatorProps> = ({ disabled, formIndex }) => {
-  const { control } = useFormContext<WorkflowNodeForm>();
-  /*
+  const { control, setValue } = useFormContext<WorkflowNodeForm>();
+  const isDisabled = React.useRef(disabled);
+
   React.useEffect(() => {
-    setValue(`nodes.${formIndex}.operator`, disabled ? null : Operators.And);
-  }, [disabled]);
-  */
+    if (isDisabled.current !== disabled) {
+      setValue(`nodes.${formIndex}.operator`, disabled ? null : Operators.And);
+      isDisabled.current = disabled;
+    }
+  }, [disabled, setValue, formIndex]);
+
   return (
     <Controller
       name={`nodes.${formIndex}.operator`}
@@ -220,7 +227,7 @@ const Operator: React.FC<OperatorProps> = ({ disabled, formIndex }) => {
       render={({ field }) => (
         <ToggleButtonGroup
           {...field}
-          value={disabled ? null : field.value || Operators.And}
+          value={field.value}
           exclusive
           size='small'
           aria-label='text alignment'
@@ -242,12 +249,11 @@ const Operator: React.FC<OperatorProps> = ({ disabled, formIndex }) => {
 const OperatorChip: React.FC<{ formIndex: number }> = ({ formIndex }) => {
   const { watch } = useFormContext<WorkflowNodeForm>();
   const value = watch(`nodes.${formIndex}.operator`);
-  console.log('operator value', value)
   return (
     <Chip
       size='small'
-      label={value.toUpperCase()}
-      color={value === Operators.And ? 'info' : 'secondary'}
+      label={value?.toUpperCase()}
+      color={!value && 'default' || value === Operators.And ? 'info' : 'secondary'}
     />
   );
 };

@@ -1,21 +1,32 @@
 'use client';
 
 import React from 'react';
-import type { Workflow, User } from '@models';
-import Detail from './_component/detail'
-import { demoData } from './_component/index';
+import type { WorkflowAttributes } from '@models/workflow.model';
+import type { Userttributes } from '@models/user.model';
+import type { Node } from './_component/form';
 import NodeForm from './_component/form';
+import Detail from './_component/detail'
 
 export type Props = {
-  workflow: Workflow;
-  users: ReadonlyModel<User>[];
+  workflow: WorkflowAttributes & { nodes: Node[] };
+  users: Userttributes[];
 };
 
 const PageClient: React.FC<Props> = (props) => {
-  const { users } = props;
+  const { workflow, users } = props;
+
+  const nodes = React.useMemo<Node[]>(() => (workflow.nodes?.length)? workflow.nodes : [{
+    workflowId: workflow.id,
+    nodeLv: 1,
+    operator: null,
+    isRoot: true,
+    isReaf: true,
+    approvers: [],
+  }], [workflow]);
+
   return (
-    <NodeForm nodes={demoData}>
-      <Detail users={users} />
+    <NodeForm workflowId={workflow.id} nodes={nodes}>
+      <Detail workflowId={workflow.id} users={users} />
     </NodeForm>
   );
 };
