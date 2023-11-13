@@ -22,8 +22,11 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
 
-import { Workflow } from 'db/models';
 import { Button } from '@mui/material';
+import type {
+  WorkflowAttributes,
+  WorkflowCreationAttributes,
+} from '@models/workflow.model';
 
 const columns: GridColDef[] = [
   { field: 'id', headerName: 'ID', width: 80 },
@@ -32,9 +35,7 @@ const columns: GridColDef[] = [
     headerName: 'Workflow Name',
     width: 130,
     editable: true,
-    renderCell: (params) => (
-      <Link href={`/workflows/${params.id}`}>{params.value}</Link>
-    ),
+    renderCell: (params) => <Link href={`/workflows/${params.id}`}>{params.value}</Link>,
   },
   {
     field: 'description',
@@ -112,10 +113,16 @@ const Toolbar: React.FC<{ onAddClick: () => void }> = (props) => {
   );
 };
 
-export type WorkflowRow = Partial<Workflow> & {
-  isNew?: boolean;
+export type WorkflowRow = {
   rowId: string | number;
-};
+} & WorkflowCreationAttributes;
+
+export function isExistsWorkflow(
+  arg: WorkflowCreationAttributes
+): arg is WorkflowAttributes {
+  const { id } = arg;
+  return !!id;
+}
 
 type Props = {
   workflows: WorkflowRow[];
@@ -126,13 +133,7 @@ type Props = {
     oldRow: WorkflowRow
   ) => Promise<WorkflowRow> | WorkflowRow;
 };
-const WorkflowTable: React.FC<Props> = ({
-  workflows,
-  removeRow,
-  addRow,
-  saveRow,
-}) => {
-
+const WorkflowTable: React.FC<Props> = ({ workflows, removeRow, addRow, saveRow }) => {
   const apiRef = useGridApiRef();
 
   //const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
@@ -239,10 +240,7 @@ const WorkflowTable: React.FC<Props> = ({
     dispatchRowModesModel({ newState: newRowModesModel });
   };
 
-  const handleRowEditStop: GridEventListener<'rowEditStop'> = (
-    params,
-    event
-  ) => {
+  const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
       event.defaultMuiPrevented = true;
     }

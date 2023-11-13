@@ -7,6 +7,7 @@ import AccountTreeIcon from '@mui/icons-material/AccountTree';
 export default async function Page({ params }: { params: { id: string } }) {
   const workflow = await getWorkflow(params.id);
   const users = await getUsers();
+  console.debug('Page', params.id);
 
   return (
     <>
@@ -30,6 +31,7 @@ export async function generateStaticParams() {
 }
 */
 const getWorkflow = async (id: string): Promise<Props['workflow']> => {
+  console.debug('getWorkflow');
   const workflow = (await Workflow.findByPk(id, {
     include: {
       association: 'nodes',
@@ -57,5 +59,6 @@ const getWorkflow = async (id: string): Promise<Props['workflow']> => {
 };
 
 const getUsers = async (): Promise<Props['users']> => {
+  console.debug('getUsers');
   return (await User.findAll()).map((item) => item.toJSON());
 };

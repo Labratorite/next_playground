@@ -1,5 +1,6 @@
 //import type { NextApiRequest, NextApiResponse } from 'next'
 import { Workflow } from '@models';
+import type { WorkflowAttributes } from '@models/workflow.model';
 
 type Params = { params: { id: string } };
 
@@ -16,7 +17,7 @@ export async function PATCH(request: Request, { params }: Params) {
   const { id } = params;
   const req = await request.json();
 
-  if (!isPostRequestBody(req)) {
+  if (!isPatchRequestBody(req)) {
     return new Response('invalid body', { status: 500 });
   }
   const workflow = (await update(id, req.workflow))?.toJSON();
@@ -31,14 +32,14 @@ export async function DELETE(req: Request, { params }: Params) {
 }
 
 export type ResponseData = {
-  workflow: Workflow | null;
+  workflow: WorkflowAttributes | null;
 };
 
 export type PatchRequestBody = {
-  workflow: Workflow;
+  workflow: WorkflowAttributes;
 };
 
-function isPostRequestBody(arg: Record<string, unknown>): arg is PatchRequestBody {
+function isPatchRequestBody(arg: Record<string, unknown>): arg is PatchRequestBody {
   return arg.workflow !== undefined;
 }
 /*
@@ -94,7 +95,7 @@ const destroy = async (id: string) => {
 }
 const update = async (
   id: string,
-  workflow: Workflow
+  workflow: WorkflowAttributes
 ) => {
   const [ affectedCount ] = await Workflow.update(workflow, {
     where: { id },

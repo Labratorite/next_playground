@@ -1,15 +1,16 @@
 import { Workflow } from '@models';
+import type { WorkflowAttributes, WorkflowCreationAttributes } from '@models/workflow.model';
 
 export type ResponseData = {
-  workflow: Workflow;
+  workflow: WorkflowAttributes;
 };
 
 export type ResponseListData = {
-  workflows: Workflow[];
+  workflows: WorkflowAttributes[];
 };
 
 export type PostRequestBody = {
-  workflow: Workflow;
+  workflow: WorkflowCreationAttributes;
 };
 
 function isPostRequestBody(arg: Record<string, unknown>): arg is PostRequestBody {
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
   return Response.json({ workflow });
 }
 
-const store = async (workflow: Workflow) => {
+const store = async (workflow: WorkflowCreationAttributes) => {
   //const [model, created] = await Workflow.upsert(workflow);
   try {
     const model = await Workflow.create(workflow);
