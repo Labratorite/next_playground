@@ -2,9 +2,9 @@
 const nextConfig = {
 /* config options here */
   // https://github.com/sequelize/sequelize/issues/7509
-  output: 'standalone',
+  // output: 'standalone',
   experimental: {
-    serverComponentsExternalPackages: ['sequelize'],
+    serverComponentsExternalPackages: ['sequelize', '@sequelize/core'],
     instrumentationHook: true
   }
 }
