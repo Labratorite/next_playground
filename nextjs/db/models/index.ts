@@ -18,7 +18,6 @@ import { User } from './user.model';
 import { Workflow } from './workflow.model';
 import { WorkflowNode } from './WorkflowNode.model';
 import { WorkflowApprover } from './WorkflowApprover.model';
-import { WorkflowNodeRelation } from './WorkflowNodeRelation.model';
 
 import config from 'config/database';
 import Seeders from '../seeders';
@@ -28,7 +27,6 @@ const models = {
   Workflow,
   WorkflowNode,
   WorkflowApprover,
-  WorkflowNodeRelation,
 };
 
 declare global { var sequelize: Sequelize | undefined }  //eslint-disable-line no-var
@@ -112,12 +110,11 @@ const initSchema = () => {
     Seeders(_this.getQueryInterface());
   });
 };
-/*
 if (isInMemory && beforeInit) {
+  //暫定
   console.warn('init schema');
   initSchema();
 }
-*/
 /*
 module.exports = {
   sequelize,
@@ -137,5 +134,4 @@ export {
   Workflow,
   WorkflowNode,
   WorkflowApprover,
-  WorkflowNodeRelation,
 };

@@ -5,17 +5,17 @@ import React from 'react';
 import Link from 'next/link';
 import Script from 'next/script';
 import useSWR, { Fetcher } from 'swr';
-import { User } from '@models/index';
+import { UserAttributes } from '@models/user.model';
 
 export type Props = {
   message?: string;
-  users?: User[];
+  users?: UserAttributes[];
   headers?: unknown;
   errorCode?: number | false;
 };
 
 //const fetcher: Fetcher<User[], string> = (path) => axios.get<User[]>(path).then((res) => res.data);
-const fetcher: Fetcher<User[], string> = (path) =>
+const fetcher: Fetcher<UserAttributes[], string> = (path) =>
   fetch(path).then((res) => res.json());
 
 const Profile: React.FC = () => {

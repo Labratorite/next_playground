@@ -2,14 +2,14 @@
 
 import React from 'react';
 import type { WorkflowAttributes } from '@models/workflow.model';
-import type { Userttributes } from '@models/user.model';
+import type { UserAttributes } from '@models/user.model';
 import type { Node } from './_component/form';
 import NodeForm from './_component/form';
 import Detail from './_component/detail'
 
 export type Props = {
   workflow: WorkflowAttributes & { nodes: Node[] };
-  users: Userttributes[];
+  users: UserAttributes[];
 };
 
 const PageClient: React.FC<Props> = (props) => {

@@ -11,7 +11,7 @@ import {
   UpdatedAt,
 } from 'sequelize-typescript';
 
-export interface Userttributes {
+export interface UserAttributes {
   id: number;
   firstName: string;
   lastName: string;
@@ -20,13 +20,13 @@ export interface Userttributes {
   fullName: string;
 }
 
-export interface UserCreationAttributes extends Optional<Userttributes, 'id' | 'fullName'> {}
+export interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'fullName'> {}
 
 @Table({
   timestamps: true,
   tableName: 'Users',
 })
-export class User extends Model<Userttributes, UserCreationAttributes> {
+export class User extends Model<UserAttributes, UserCreationAttributes> {
   @Column
   firstName!: string;
 

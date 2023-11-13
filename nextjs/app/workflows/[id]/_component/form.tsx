@@ -9,10 +9,10 @@ import {
 } from 'react-hook-form';
 import type { WorkflowNodeCreationAttributes } from '@models/WorkflowNode.model';
 import type { WorkflowApproverCreationAttributes } from '@models/WorkflowApprover.model';
-import type { Userttributes } from '@models/user.model';
+import type { UserAttributes } from '@models/user.model';
 import { syncNodes } from './action';
 
-export type ReadOnlyUser = Pick<Userttributes, 'id' | 'nickname'>;
+export type ReadOnlyUser = Pick<UserAttributes, 'id' | 'nickname'>;
 export type Approver = Omit<WorkflowApproverCreationAttributes, 'workflowNodeId' | 'approver'> & { approver: ReadOnlyUser };
 export type Node = Omit<WorkflowNodeCreationAttributes, 'approvers' | 'workflowNodeId'> & { approvers: Approver[]};
 

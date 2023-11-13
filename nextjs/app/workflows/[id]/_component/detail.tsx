@@ -18,7 +18,7 @@ import AddIcon from '@mui/icons-material/Add';
 import clsx from 'clsx';
 import { TransitionGroup } from 'react-transition-group';
 import { Operators } from 'types/enum';
-import type { Userttributes } from '@models/user.model';
+import type { UserAttributes } from '@models/user.model';
 import type { Approver, Node, WorkflowNodeForm } from './form';
 import { useNodeFieldArray, useApproverFieldArray } from './form';
 import ApproverCard from './approver';
@@ -28,7 +28,7 @@ import { NodeRoot } from './node.styled';
 
 type Props = {
   workflowId: number;
-  users: Userttributes[];
+  users: UserAttributes[];
   deleteNode?: () => void;
   addNode?: () => void;
   update?: () => void;
@@ -84,7 +84,7 @@ const WorkflowDetail: React.FC<Props> = ({ workflowId, users }) => {
 
 export default WorkflowDetail;
 
-const useSelectableUser = (users: Userttributes[], formIndex: number) => {
+const useSelectableUser = (users: UserAttributes[], formIndex: number) => {
   const { watch } = useFormContext<WorkflowNodeForm>();
   const approvers = watch(`nodes.${formIndex}.approvers`);
   return React.useMemo(
