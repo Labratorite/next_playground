@@ -99,6 +99,7 @@ export async function syncNodes(workflowId: number, formData: WorkflowNodeForm) 
         //新規approver
         if (newApprovers.length > 0) {
           await WorkflowApprover.bulkCreate(
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             newApprovers.map(({ id, ...approver }) => ({ // idはsetされてても無視する
               ...approver,
               workflowId,
