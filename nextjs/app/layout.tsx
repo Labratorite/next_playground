@@ -2,6 +2,8 @@ import { Metadata } from 'next';
 import ThemeRegistry from 'components/theme-registry';
 import Layout from 'components/layout';
 import '../styles/global.scss';
+import ProgressProvider from 'components/progress';
+import SnackbarAlertProvider from 'components/snackbar-alert';
 
 export const metadata: Metadata = {
   title: 'Home',
@@ -19,7 +21,11 @@ export default function RootLayout({
     <html lang='en'>
       <body>
         <ThemeRegistry options={{ key: 'mui' }}>
-          <Layout>{children}</Layout>
+          <ProgressProvider>
+            <SnackbarAlertProvider>
+              <Layout>{children}</Layout>
+            </SnackbarAlertProvider>
+          </ProgressProvider>
         </ThemeRegistry>
       </body>
     </html>

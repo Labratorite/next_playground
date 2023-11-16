@@ -11,6 +11,7 @@ import type {
   WorkflowAttributes,
   WorkflowCreationAttributes,
 } from '@models/workflow.model';
+import { useProgress } from 'components/progress';
 
 export type ValidProps = {
   workflows: WorkflowAttributes[];
@@ -38,6 +39,8 @@ export default ClientPage;
 
 const Page: React.FC<ValidProps & ServerActions> = (props) => {
   const { workflows, storeWorkflow } = props;
+  const { setProgress, withProgress } = useProgress();
+
   const [rows, setRows] = React.useState<WorkflowRow[]>(
     workflows.map((item) => ({ ...item, rowId: item.id }))
   );
@@ -50,8 +53,9 @@ const Page: React.FC<ValidProps & ServerActions> = (props) => {
       if (canceled) {
         setRows((rows) => rows.filter((row) => row.id || row.rowId !== rowId));
       } else {
-        await deleteWorkflow(rowId);
-        setRows((rows) => rows.filter((row) => row.rowId !== rowId));
+        if (await deleteWorkflow(rowId)) {
+          setRows((rows) => rows.filter((row) => row.rowId !== rowId));
+        }
       }
     },
     []
@@ -66,6 +70,7 @@ const Page: React.FC<ValidProps & ServerActions> = (props) => {
 
   const saveRow = React.useCallback(
     async (newRow: WorkflowRow) => {
+      setProgress(true);
       // Server api
       //setRows((rows) => rows.map((row) => (row.rowId === newRow.rowId ? { ...newRow, isNew: false } : row)));
       const { rowId, ...data } = newRow;
@@ -82,10 +87,10 @@ const Page: React.FC<ValidProps & ServerActions> = (props) => {
         console.debug('model', model);
       }
       setRows((rows) => rows.map((row) => (row.rowId === rowId ? model : row)));
-
+      setProgress(false);
       return model; // DataGridのprocessRowUpdateのために返却しているけど、server action にするならredirectにするのが正しいかもしれない
     },
-    [storeWorkflow]
+    [storeWorkflow, setProgress]
   );
 
   /*
@@ -105,8 +110,11 @@ const Page: React.FC<ValidProps & ServerActions> = (props) => {
   };
 
   const deleteWorkflow = async (rowId: string | number) => {
-    const res = await axios.delete(`/workflows/api/${rowId}`);
-    console.debug('deleteWorkflow', res);
+    return await withProgress(async () => {
+      const res = await axios.delete(`/workflows/api/${rowId}`);
+      console.debug('deleteWorkflow', res);
+      return res;
+    });
   };
 
   return (

@@ -10,6 +10,8 @@ import {
 import type { WorkflowNodeCreationAttributes } from '@models/WorkflowNode.model';
 import type { WorkflowApproverCreationAttributes } from '@models/WorkflowApprover.model';
 import type { UserAttributes } from '@models/user.model';
+import { useProgress } from 'components/progress';
+import { useAlert } from 'components/snackbar-alert';
 import { syncNodes } from './action';
 
 export type ReadOnlyUser = Pick<UserAttributes, 'id' | 'nickname'>;
@@ -53,9 +55,26 @@ export default function NodeForm(props: Props) {
     return () => subscription.unsubscribe();
   }, [watch]);
 
+  const { withProgress } = useProgress();
+  const { setAlert } = useAlert();
+
   const onSubmit = handleSubmit(async (data) => {
-    const res = await syncNodes(workflowId, data);
-    console.log('res', res);
+    const nodes = data.nodes.map((node, index) => {
+      node.nodeLv = index + 1;
+      node.isReaf = index + 1 === data.nodes.length;
+      node.approvers.forEach((approver, i) => approver.orderNo = i+1);
+      return node;
+    });
+
+    await withProgress(async () => {
+      const res = await syncNodes(workflowId, { nodes });
+      console.log('res', res);
+      return res;
+    });
+  }, (errors, event) => {
+    setAlert({ open: true, alert: "Validation Error" });
+    console.log('handleSubmit:errors', errors);
+    console.log('handleSubmit:event', event);
   });
 
   const hasRendered = React.useRef(false);
@@ -94,5 +113,6 @@ export const useApproverFieldArray = (index: number) => {
     control,
     name: `nodes.${index}.approvers` as const,
     keyName: 'uid',
+    rules: { required: { value: true, message: "approverは必須です" } },
   });
 };

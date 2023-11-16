@@ -181,7 +181,6 @@ We're working hard on making Sequelize a breeze to use in TypeScript. Some parts
 - `npm install @faker-js/faker --save-dev`
 
 - `npm install @mui/material @emotion/react @emotion/styled`
-- `npm install @mui/icons-material @mui/x-data-grid`
-- `npm install react-hook-form`
-- `npm install react-transition-group`
+- `npm install @mui/icons-material @mui/x-data-grid react-transition-group`
+- `npm install react-hook-form @hookform/error-message`
 

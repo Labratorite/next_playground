@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { animateScroll as scroller } from 'react-scroll';
-import { Controller, useFormContext } from 'react-hook-form';
+import { Controller, useFormContext, useFormState } from 'react-hook-form';
+import { ErrorMessage } from '@hookform/error-message';
 import {
   Button,
   Card,
@@ -25,6 +26,7 @@ import ApproverCard from './approver';
 import NodeActionButton from './node-action';
 import { useUserDialog } from './selector';
 import { NodeRoot } from './node.styled';
+import InvalidTypography from 'components/invalid-typography';
 
 type Props = {
   workflowId: number;
@@ -190,6 +192,7 @@ const Node: React.FC<NodeProps> = (props) => {
             */}
           </Stack>
         </Card>
+        <ApproversInvalidMessage formIndex={formIndex} />
       </div>
       <div className='node joint'>
         <Button
@@ -201,6 +204,18 @@ const Node: React.FC<NodeProps> = (props) => {
         </Button>
       </div>
     </NodeRoot>
+  );
+};
+
+const ApproversInvalidMessage: React.FC<{ formIndex: number }> = ({ formIndex }) => {
+  const { control } = useFormContext<WorkflowNodeForm>();
+  const { errors } = useFormState({ control });
+  return (
+    <ErrorMessage
+      errors={errors}
+      name={`nodes.${formIndex}.approvers.root`}
+      render={({ message }) => <InvalidTypography value={ message } style={{ marginTop: '0.5em'}}/>}
+    />
   );
 };
 
@@ -253,7 +268,7 @@ const OperatorChip: React.FC<{ formIndex: number }> = ({ formIndex }) => {
     <Chip
       size='small'
       label={value?.toUpperCase()}
-      color={!value && 'default' || value === Operators.And ? 'info' : 'secondary'}
+      color={(!value && 'default') || value === Operators.And ? 'info' : 'secondary'}
     />
   );
 };
