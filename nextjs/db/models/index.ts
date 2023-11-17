@@ -1,18 +1,5 @@
 'use strict';
 
-//import fs from 'fs';
-/*
-const Sequelize = require('sequelize-typescript');
-const { User } = require('db/models/user.model');
-const { Workflow } = require('db/models/workflow.model');
-const { WorkflowNode } = require('db/models/WorkflowNode.model');
-const { WorkflowApprover } = require('db/models/WorkflowApprover.model');
-const { WorkflowNodeRelation } = require('db/models/WorkflowNodeRelation.model');
-
-const config = require('config/database');
-const Seeders = require('db/seeders');
-const { GlobalRef } = require('lib/global-ref');
-*/
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript';
 import { User } from './user.model';
 import { Workflow } from './workflow.model';
@@ -29,21 +16,16 @@ const models = {
   WorkflowApprover,
 };
 
-declare global { var sequelize: Sequelize | undefined }  //eslint-disable-line no-var
+type SequelizeSingleton = ReturnType<typeof initSequelize>
 
-/*
-const modelMatch = (filename, member) => {
-  return (
-    filename.substring(0, filename.indexOf('.model')).toLowerCase() ===
-    member.toLowerCase()
-  );
-};
-*/
+declare global {
+  var sequelize: SequelizeSingleton | undefined; //eslint-disable-line no-var
+}
 
-const initSequelize = () => {
+function initSequelize() {
   const options = {
     ...config,
-    models: Object.values(models),
+    //models: Object.values(models),
     /* pathを利用してのloadが使えない
       models: [process.cwd() + '/db/models/*.model.ts'],
       modelMatch,
@@ -64,6 +46,13 @@ const initSequelize = () => {
 const models = {};
 const cmd = process.cwd() + '/db/models';
 
+const modelMatch = (filename, member) => {
+  return (
+    filename.substring(0, filename.indexOf('.model')).toLowerCase() ===
+    member.toLowerCase()
+  );
+};
+
 fs.readdirSync(cmd)
   .filter((file) => file.endsWith('.model.ts'))
   .forEach((file) => {
@@ -83,49 +72,32 @@ sequelize.addModels(Object.values(models));
 */
 
 const isInMemory = config.storage === ':memory:';
-const beforeInit = !global.sequelize;
-console.log('beforeInit0', beforeInit);
 
-global.sequelize = global.sequelize || initSequelize();
-
-if (!global.sequelize) {
-  global.sequelize = initSequelize();
-
-  // this is private study project. basicly running on sqlite.
-  // it can remigration every time.
-  //https://sequelize.org/docs/v6/core-concepts/model-basics/
-  console.warn('init schema');
-  global.sequelize.sync().then((_this) => {
-    Seeders(_this.getQueryInterface());
-  });
-} else {
-  global.sequelize.addModels(Object.values(models));
-}
-const sequelize = global.sequelize;
-
-
-const initSchema = () => {
+function initSchema(){
   if (!isInMemory) return;
+  console.warn('init schema');
   return global.sequelize?.sync().then((_this) => {
     Seeders(_this.getQueryInterface());
   });
 };
-if (isInMemory && beforeInit) {
-  //暫定
-  console.warn('init schema');
-  initSchema();
-}
-/*
-module.exports = {
-  sequelize,
-  initSchema,
-  ...models, // export するinstanseとaddModelsしたinstanceが同じである必要がある
-};
-*/
 
-//models.sequelize = sequelize;
-//models.initSchema = initSchema;
-//module.exports = models; // export するinstanseとsequelizeにaddModelsしたinstanceが同じである必要がある
+if (!global.sequelize) {
+  console.warn('global sequelize is not found');
+} else {
+  console.log('there is global sequelize');
+}
+
+const sequelize = global.sequelize || initSequelize();
+sequelize.addModels(Object.values(models));
+
+if (!global.sequelize) {
+  global.sequelize = sequelize;
+
+  // this is private study project. basicly running on sqlite.
+  // it can remigration every time.
+  //https://sequelize.org/docs/v6/core-concepts/model-basics/
+  if (isInMemory) initSchema();
+}
 
 export {
   sequelize,

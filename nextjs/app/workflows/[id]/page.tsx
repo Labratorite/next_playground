@@ -1,6 +1,6 @@
 import { PageNotFoundError } from 'next/dist/shared/lib/utils';
 import Client, { Props } from './client';
-import { Workflow, User } from '@models';
+import { Workflow, User } from 'db/models';
 import { Card, CardHeader, Container } from '@mui/material';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 
@@ -25,7 +25,7 @@ export default async function Page({ params }: { params: { id: string } }) {
 }
 /*
 export async function generateStaticParams() {
-  const keys = (await Workflow.findAll()).map(( { id } ) => ({ id }));
+  const keys = (await Workflow.findAll()).map((model) => ({ id: model.toJSON().id.toString() }));
 
   return keys;
 }
@@ -49,13 +49,13 @@ const getWorkflow = async (id: string): Promise<Props['workflow']> => {
       ['nodes', 'nodeLv', 'ASC'],
       ['nodes', 'approvers', 'orderNo', 'ASC'],
     ],
-  }))?.toJSON();
+  }))?.toJSON<Props['workflow']>();
+  // ↑eager loading 時の戻り値の型が対応されていなかった。WorkflowAttributesが戻ってくる
+
   if (!workflow) {
     throw new PageNotFoundError('not found');
   }
-  // eager loading 時の戻り値の型が対応されていなかった。WorkflowAttributesが戻ってくる
-  // 一旦無理やり書き換え
-  return workflow as Props['workflow'];
+  return workflow;
 };
 
 const getUsers = async (): Promise<Props['users']> => {

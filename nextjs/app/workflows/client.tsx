@@ -70,7 +70,6 @@ const Page: React.FC<ValidProps & ServerActions> = (props) => {
 
   const saveRow = React.useCallback(
     async (newRow: WorkflowRow) => {
-      setProgress(true);
       // Server api
       //setRows((rows) => rows.map((row) => (row.rowId === newRow.rowId ? { ...newRow, isNew: false } : row)));
       const { rowId, ...data } = newRow;
@@ -78,17 +77,22 @@ const Page: React.FC<ValidProps & ServerActions> = (props) => {
 
       let model = { ...data, rowId };
       // error は handleProcessRowUpdateError で処理
-      if (isExistsWorkflow(data)) {
-        console.debug('isExistsWorkflow');
-        await updateWorkflow(data);
-      } else {
-        const stored = await storeWorkflow(data);
-        model = { ...stored, rowId: stored.id };
-        console.debug('model', model);
+
+      setProgress(true);
+      try {
+        if (isExistsWorkflow(data)) {
+          console.debug('isExistsWorkflow');
+          await updateWorkflow(data);
+        } else {
+          const stored = await storeWorkflow(data);
+          model = { ...stored, rowId: stored.id };
+          console.debug('model', model);
+        }
+        setRows((rows) => rows.map((row) => (row.rowId === rowId ? model : row)));
+        return model; // DataGridのprocessRowUpdateのために返却しているけど、server action にするならredirectにするのが正しいかもしれない
+      } finally {
+        setProgress(false);
       }
-      setRows((rows) => rows.map((row) => (row.rowId === rowId ? model : row)));
-      setProgress(false);
-      return model; // DataGridのprocessRowUpdateのために返却しているけど、server action にするならredirectにするのが正しいかもしれない
     },
     [storeWorkflow, setProgress]
   );
